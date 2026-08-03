@@ -191,6 +191,33 @@ describe('Game', function () {
     });
   });
 
+  describe('#move() checkmate priority', function () {
+    it('Flag capture wins over no-moveable-pieces', function () {
+      // 构造终局：红方只剩军旗+2地雷（无棋可走），蓝方司令在 b11 准备吃旗
+      // 吃旗后红方同时满足 inCheck 和 hasMoveablePieces=false，
+      // 状态必须报 checkmate（军旗被吃优先级最高），而不是 nopieces
+      const { Piece, PieceRank } = require('../src/lib/Piece') as any;
+      const game = new Game({ playerName: '', playerColor: 'blue' });
+      game.board.boardState = {
+        b12: new Piece('r', PieceRank.FLAG),
+        a12: new Piece('r', PieceRank.LANDMINE),
+        c12: new Piece('r', PieceRank.LANDMINE),
+        b11: new Piece('b', PieceRank.COMMANDER)
+      };
+      game.players[0].isSetup = true;
+      game.players[1].isSetup = true;
+      game.status = 'ongoing';
+      game.activePlayer = game.players[0];
+      game.validMoves = [{ type: 'attack', startSquare: 'b11', endSquare: 'b12' }];
+
+      const ok = game.move('b11 x b12');
+      assert.equal(ok, true);
+      assert.equal(game.players[1].inCheck, true, '红方军旗应被吃');
+      assert.equal(game.players[1].hasMoveablePieces, false, '红方应无棋可走');
+      assert.equal(game.status, 'checkmate', '吃旗应报 checkmate 而非 nopieces');
+    });
+  });
+
   describe('#forfeit()', function () {
     var gameRedSide = new Game({
       playerName: '',

@@ -327,11 +327,11 @@ export class Game {
             inactivePlayer.hasMoveablePieces = false;
         }
 
+        // 军旗被吃（checkmate）优先于无棋可走（nopieces）：
+        // 两个条件同时满足时（吃旗后对方恰好无棋可走），必须报 checkmate
         if (inactivePlayer && inactivePlayer.inCheck) {
             this.status = GameStatus.CHECKMATE;
-        }
-
-        if (inactivePlayer && inactivePlayer.hasMoveablePieces === false) {
+        } else if (inactivePlayer && inactivePlayer.hasMoveablePieces === false) {
             this.status = GameStatus.NO_PIECES;
         }
 
