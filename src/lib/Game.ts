@@ -59,6 +59,17 @@ export class Game {
 
             this.colorMap = { 'b': 0, 'r': 1 };
         }
+
+        // 人机对战模式：电脑玩家占 aiMode 颜色，直接加入并完成布阵
+        if (params.aiMode) {
+            const aiPlayer = this.players.find(p => p.color === params.aiMode);
+            if (aiPlayer) {
+                aiPlayer.isAI = true;
+                aiPlayer.name = '电脑 🤖';
+                aiPlayer.joined = true;
+                aiPlayer.isSetup = true;
+            }
+        }
     }
 
     /**

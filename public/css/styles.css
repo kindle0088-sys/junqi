@@ -113,6 +113,12 @@ select.form-control { cursor: pointer; }
 .btn-secondary { background: #334155; color: var(--text-primary); }
 .btn-secondary:hover { background: #475569; }
 
+/* AI 对战卡片与按钮 */
+.ai-card { border: 1px solid #7c3aed66; background: linear-gradient(180deg, #1e1b4b 0%, #1e293b 100%); }
+.ai-card h3 { color: #a78bfa; }
+.btn-ai { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; }
+.btn-ai:hover { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+
 .btn-group { display: flex; gap: 8px; }
 .btn-group .btn { flex: 1; }
 .btn-group .btn.active { background: var(--accent-blue); color: #fff; }

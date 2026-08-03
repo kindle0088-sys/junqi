@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { GameStore } from '../lib/GameStore';
 import { Game } from '../lib/Game';
+import { AIPlayer } from '../lib/AIPlayer';
 import { 
   SessionData, 
   MoveData, 
@@ -37,6 +38,55 @@ function sendFilteredUpdatesToGame(gameID: string, game: Game) {
 
 let IO: Server | null = null;
 let DB: GameStore | null = null;
+
+// 人机对战：每个游戏的 AI 实例缓存（AIPlayer 有记忆状态，需跨步保持）
+const aiPlayers: { [gameID: string]: AIPlayer } = {};
+const aiTimers: { [gameID: string]: ReturnType<typeof setTimeout> } = {};
+
+/**
+ * 若当前轮到电脑玩家，延迟片刻后自动走子并广播。
+ * 在 finishSetup / move 之后调用，递归触发直到轮到人类玩家。
+ */
+function maybeTriggerAI(gameID: string) {
+  if (!DB) return;
+  const game = DB.find(gameID);
+  if (!game || game.status !== 'ongoing') return;
+
+  const active = game.activePlayer;
+  if (!active || !active.color) return;
+  const activePlayer = game.players.find(p => p.color === active.color);
+  if (!activePlayer || !activePlayer.isAI) return;
+
+  // 已有排队中的 AI 走子，跳过（避免重复触发）
+  if (aiTimers[gameID]) return;
+
+  const thinkMs = 600 + Math.floor(Math.random() * 700); // 0.6~1.3s 思考延迟
+  aiTimers[gameID] = setTimeout(() => {
+    delete aiTimers[gameID];
+
+    const g = DB?.find(gameID);
+    if (!g || g.status !== 'ongoing') return;
+    const curActive = g.activePlayer;
+    const curPlayer = curActive?.color ? g.players.find(p => p.color === curActive.color) : null;
+    if (!curPlayer?.isAI || !curActive?.color) return;
+
+    // 获取或创建该游戏的 AI 实例（记忆状态跨步保留）
+    let ai = aiPlayers[gameID];
+    if (!ai) {
+      ai = new AIPlayer(curActive.color);
+      aiPlayers[gameID] = ai;
+    }
+
+    const moveString = ai.chooseMove(g);
+    if (moveString) {
+      console.log(`AI(${curActive.color}) ${gameID}: ${moveString}`);
+      g.move(moveString);
+      sendFilteredUpdatesToGame(gameID, g);
+    }
+    // AI 走完后可能又轮到 AI（理论上不会，除非是 AI vs AI），继续触发
+    maybeTriggerAI(gameID);
+  }, thinkMs);
+}
 
 /**
  * Add player to game
@@ -122,6 +172,9 @@ const finishSetup = function (this: Socket, gameID: string) {
   // Send filtered updates to all players in the game
   sendFilteredUpdatesToGame(gameID, game);
 
+  // 人机对战：布阵完成后 AI 可能先手（蓝方），触发 AI 走子
+  maybeTriggerAI(gameID);
+
   console.log(sess.playerName + ' finish setup in game ' + gameID);
 };
 
@@ -164,6 +217,9 @@ const move = function (this: Socket, data: MoveData) {
 
   // Send filtered updates to all players in the game
   sendFilteredUpdatesToGame(data.gameID, game);
+
+  // 人机对战：人类玩家走完后轮到 AI，触发 AI 走子
+  maybeTriggerAI(data.gameID);
 
   console.log(data.gameID + ' ' + sess.playerName + ': ' + data.move);
 };

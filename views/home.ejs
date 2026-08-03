@@ -32,6 +32,25 @@
       </form>
     </div>
 
+    <div class="home-card ai-card">
+      <h3>🤖 和电脑对战</h3>
+      <p style="color:var(--text-muted);font-size:.82rem;margin-bottom:12px;">单人练习模式 · 智能 AI 对手</p>
+      <form id="aiForm" action="/ai-start" method="POST">
+        <div class="form-group">
+          <label>选择你的阵营</label>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn active">
+              <input type="radio" name="player-color" value="blue" checked hidden> 蓝方（先手）
+            </label>
+            <label class="btn">
+              <input type="radio" name="player-color" value="red" hidden> 红方
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-ai" style="width:100%">🤖 开始单人练习</button>
+      </form>
+    </div>
+
     <div class="home-card">
       <h3>🔗 加入已有房间</h3>
       <form id="joinForm" action="/join" method="POST">

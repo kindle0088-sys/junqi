@@ -17,6 +17,8 @@ export interface SocketHandshake {
 export interface PlayerSession {
   playerColor: 'red' | 'blue';
   playerName: string;
+  /** 若指定，则本局为"人机对战"模式，aiMode 是电脑占的颜色 */
+  aiMode?: 'red' | 'blue' | null;
 }
 
 export interface PlayerStatus {
@@ -28,6 +30,8 @@ export interface PlayerStatus {
   hasCommander: boolean;
   hasMoveablePieces: boolean;
   forfeited: boolean;
+  /** 是否为电脑玩家（人机对战模式） */
+  isAI?: boolean;
 }
 
 export enum GameStatus {

@@ -167,6 +167,43 @@ export class HttpRoutes {
   };
 
   /**
+   * Process "Start AI Game" form submission (人机对战)
+   * 电脑自动占另一方颜色
+   */
+  aiStartGame(req: Express.Request<{}, {}, StartGameFormData>, res: Express.Response): void {
+    var self = this;
+
+    // Create a new session
+    req.session.regenerate(function (err: Error | null) {
+      if (err) {
+        res.redirect('/');
+        return;
+      }
+
+      // Validate form input
+      var validData = self.validateStartGame(req);
+      if (!validData) {
+        res.redirect('/');
+        return;
+      }
+
+      // 电脑占另一方颜色
+      var aiMode: 'red' | 'blue' = (validData.playerColor === 'red') ? 'blue' : 'red';
+
+      // Create new game with AI mode
+      var gameID = DB.add({ ...validData, aiMode: aiMode });
+
+      // Save data to session
+      (req.session as any).gameID = gameID;
+      (req.session as any).playerColor = validData.playerColor;
+      (req.session as any).playerName = validData.playerName;
+
+      // Redirect to game page
+      res.redirect('/game/' + gameID);
+    });
+  };
+
+  /**
    * Process "Join Game" form submission
    * Redirects to game page on success or home page on failure
    */
@@ -227,6 +264,7 @@ export function attach(app: Express.Application, db: GameStore) {
   app.get('/', httpRoutes.home.bind(httpRoutes));
   app.get('/game/:id', httpRoutes.game.bind(httpRoutes));
   app.post('/start', httpRoutes.startGame.bind(httpRoutes));
+  app.post('/ai-start', httpRoutes.aiStartGame.bind(httpRoutes));
   app.post('/join', httpRoutes.joinGame.bind(httpRoutes));
   // Catch-all for unmatched routes
   app.all('/*splat', httpRoutes.invalid.bind(httpRoutes));
