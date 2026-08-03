@@ -4,7 +4,7 @@
  */
 const { io } = require('socket.io-client');
 
-const BASE = 'http://localhost:3000';
+const BASE = process.env.BASE_URL || 'http://localhost:3000';
 let failures = 0;
 
 function check(name, cond, extra = '') {
@@ -106,20 +106,28 @@ function waitFor(socket, predicate, timeoutMs = 5000) {
   check('存在可用的着法', !!pick, pick ? `${pick.startSquare} ${pick.type} ${pick.endSquare}` : '无');
   if (pick) {
     const symbol = pick.type === 'attack' ? 'x' : '-';
+    // 提前注册红方监听：蓝方走子后服务器广播 update 给所有玩家，
+    // 若等到步骤 5 才注册会错过事件（公网高延迟下必现）
+    const pendingRedView = waitFor(sockB, d => d.activePlayer && d.activePlayer.color === 'red' && d.validMoves);
     const pendingAfter = waitFor(sockA, d => d.activePlayer && d.activePlayer.color === 'red');
     sockA.emit('move', { gameID, move: `${pick.startSquare} ${symbol} ${pick.endSquare}` });
     const stateAfter = await pendingAfter;
+    const redState = await pendingRedView;
     check('蓝方走子后轮到红方', stateAfter.activePlayer.color === 'red', `lastMove=${JSON.stringify(stateAfter.lastMove)}`);
-  }
+    check('红方同步到同一状态', redState.activePlayer && redState.activePlayer.color === 'red');
 
-  console.log('=== 5. 红方走子 ===');
-  const validRed = (await new Promise(r => { let h = (d) => { if (d.validMoves && d.validMoves.length >= 0 && d.activePlayer && d.activePlayer.color === 'red') { sockB.off('update', h); r(d); } }; sockB.on('update', h); })).validMoves;
-  const redMove = validRed.find(m => m.type === 'move') || validRed[0];
-  check('红方有合法着法', !!redMove, redMove ? `${redMove.startSquare} ${redMove.type} ${redMove.endSquare}` : '无');
-  if (redMove) {
-    sockB.emit('move', { gameID, move: `${redMove.startSquare} ${redMove.type === 'attack' ? 'x' : '-'} ${redMove.endSquare}` });
-    const st = await waitFor(sockB, d => d.activePlayer && d.activePlayer.color === 'blue');
-    check('红方走子后轮回到蓝方', st.activePlayer.color === 'blue');
+    console.log('=== 5. 红方走子 ===');
+    const validRed = redState.validMoves;
+    const redMove = validRed.find(m => m.type === 'move') || validRed[0];
+    check('红方有合法着法', !!redMove, redMove ? `${redMove.startSquare} ${redMove.type} ${redMove.endSquare}` : '无');
+    if (redMove) {
+      sockB.emit('move', { gameID, move: `${redMove.startSquare} ${redMove.type === 'attack' ? 'x' : '-'} ${redMove.endSquare}` });
+      const st = await waitFor(sockB, d => d.activePlayer && d.activePlayer.color === 'blue');
+      check('红方走子后轮回到蓝方', st.activePlayer.color === 'blue');
+    }
+  } else {
+    console.log('=== 5. 红方走子 ===');
+    check('蓝方无着法可用，跳过红方测试', false);
   }
 
   console.log('=== 6. 非法走子被拒 ===');
