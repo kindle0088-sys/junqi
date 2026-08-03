@@ -1,7 +1,7 @@
 /*
 * Defines the adjacency graph for nodes on the board.
 */
-import { BUNKER_SQUARES, FRONT_ROW_SQUARES, HEADQUARTER_SQUARES } from './BoardConstants';
+import { BUNKER_SQUARES, FRONT_ROW_SQUARES } from './BoardConstants';
 
 interface TransformOffset {
   x: number;
@@ -83,10 +83,11 @@ export class Graph {
     this.addEdgesInFrontRowSamePlayer(neighborMap)
     this.addEdgesBetweenDifferentPlayers(neighborMap);
 
-    // Set headquarter squares to immobile
-    HEADQUARTER_SQUARES.forEach(function(square: string) {
-      neighborMap[square].clear();
-    });
+    // NOTE: 大本营(营地)邻接关系不再被清空。
+    // 原代码把 HQ 格子的邻接清空,导致任何进入大本营的棋子(含非地雷)都被困死。
+    // 标准军旗规则:只有"军旗"被限制在大本营内,其他棋子(非地雷)都可以从大本营走出。
+    // 军旗/地雷的不可移动性由 Piece.isMovable() 保证(Board.getMovesForPlayer 已过滤),
+    // 因此这里无需也不应清空邻接。
 
     return neighborMap;
   }

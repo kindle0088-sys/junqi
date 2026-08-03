@@ -63,7 +63,7 @@ export const CSS_CLASSES = {
     
     // Combined classes
     HIGHLIGHT: 'selected valid-move valid-attack valid-swap',
-    ALL_GAME_CLASSES: 'not-moved empty selected valid-move valid-attack valid-swap last-move'
+    ALL_GAME_CLASSES: 'not-moved empty facedown selected valid-move valid-attack valid-swap last-move'
 };
 
 // Rank prefix for CSS classes
