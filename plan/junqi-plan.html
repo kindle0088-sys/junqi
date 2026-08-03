@@ -47,8 +47,14 @@
 <body>
 <div class="container">
 
-<h1>🎲 行军旗（军棋）网页版 · 开��计划</h1>
+<h1>🎲 行军旗（军棋）网页版 · 开发计划</h1>
 <p class="subtitle">2026-07-26 · 双人在线对战 · 巴迪 🐾 出品</p>
+
+<div style="background:#450a0a; border:2px solid #fca5a5; border-radius:8px; padding:16px 20px; margin:20px 0;">
+  <strong style="color:#fca5a5; font-size:1.1rem;">⚠️ 历史草案 — 2026-08-03 标记</strong>
+  <p style="color:#fecaca; margin:8px 0 0;">本文档是项目初期的"从零重写"设想方案，<strong>实际实现走的是 fork 改造路线</strong>（基于 <code>samuelyuan/online-junqi</code> 中文化 + 视觉改造，DOM 渲染而非 Canvas）。<br>
+  架构与协议章节（§2/§3/§4）已过时，<strong>请以代码为准</strong>；§1 规则章节（棋子体系/胜负判定/布局约束）仍准确，可作为领域知识参考。</p>
+</div>
 
 <!-- ============================================================ -->
 <h2>1. 游戏规则确认</h2>
@@ -110,7 +116,7 @@
 
 <h3>1.4 胜负判定</h3>
 <ol>
-  <li>吃掉对方 <strong>军旗</strong> → ���</li>
+  <li>吃掉对方 <strong>军旗</strong> → 胜</li>
   <li>对方 <strong>无棋可走</strong>（仅剩地雷+军旗）→ 胜</li>
   <li>对方 <strong>认输/超时</strong> → 胜</li>
 </ol>
@@ -266,7 +272,7 @@
     { id: 'socket2', name: '玩家B', side: 'blue' }
   ],
   board: [],             // 所有棋子
-  currentTurn: 'red',    // 当��轮到谁
+  currentTurn: 'red',    // 当前轮到谁
   phase: 'placement' | 'playing' | 'finished',
   winner: null,
   moveHistory: []
@@ -286,7 +292,7 @@
 │  ┌────────────────────┐ ┌────────────┐  │
 │  │    Canvas 棋盘      │ │  信息面板   │  │
 │  │    - 铁路/公路线    │ │  - 当前轮次 │  │
-│  │    - 行营/大本营    �� │  - 吃子记录 │  │
+│  │    - 行营/大本营    │  │  - 吃子记录 │  │
 │  │    - 棋子图形       │ │  - 聊天     │  │
 │  │    - 选中高亮       │ │  - 认输按钮 │  │
 │  └────────────────────┘ └────────────┘  │
@@ -305,7 +311,7 @@
   <li>红方在下（近端），蓝方在上（远端）</li>
 </ul>
 
-<h3>6.3 交互设���</h3>
+<h3>6.3 交互设计</h3>
 <ol>
   <li><strong>点击棋子</strong> → 选中，高亮显示可移动位置</li>
   <li><strong>点击目标位置</strong> → 发送走子请求</li>
