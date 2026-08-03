@@ -54,7 +54,7 @@ const join = function (this: Socket, gameID: string) {
   // Check if user has permission to access this game
   if (gameID !== sess.gameID) {
     console.log('ERROR: Access Denied', debugInfo);
-    this.emit('error', { message: "You cannot join this game" });
+    this.emit('error', { message: "你无权加入这个房间" });
     return;
   }
 
@@ -63,7 +63,7 @@ const join = function (this: Socket, gameID: string) {
 
   if (!game) {
     console.log('ERROR: Game Not Found', debugInfo);
-    this.emit('error', { message: "Game not found" });
+    this.emit('error', { message: "房间不存在" });
     return;
   }
 
@@ -71,7 +71,7 @@ const join = function (this: Socket, gameID: string) {
   const result = game.addPlayer(sess);
   if (!result) {
     console.log('ERROR: Failed to Add Player', debugInfo);
-    this.emit('error', { message: "Unable to join game" });
+    this.emit('error', { message: "无法加入房间" });
     return;
   }
 
@@ -99,7 +99,7 @@ const finishSetup = function (this: Socket, gameID: string) {
   // Check if user has permission to access this game
   if (gameID !== sess.gameID) {
     console.log('ERROR: Access Denied', debugInfo);
-    this.emit('error', { message: "You have not joined this game" });
+    this.emit('error', { message: "你尚未加入这个房间" });
     return;
   }
 
@@ -107,7 +107,7 @@ const finishSetup = function (this: Socket, gameID: string) {
   const game = DB?.find(gameID);
   if (!game) {
     console.log('ERROR: Game Not Found', debugInfo);
-    this.emit('error', { message: "Game not found" });
+    this.emit('error', { message: "房间不存在" });
     return;
   }
 
@@ -115,7 +115,7 @@ const finishSetup = function (this: Socket, gameID: string) {
   const result = game.finishSetup(sess);
   if (!result) {
     console.log('ERROR: Failed to finalize setup', debugInfo);
-    this.emit('error', { message: "Setup not finalized yet" });
+    this.emit('error', { message: "布阵尚未完成" });
     return;
   }
 
@@ -142,7 +142,7 @@ const move = function (this: Socket, data: MoveData) {
   // Check if user has permission to access this game
   if (data.gameID !== sess.gameID) {
     console.log('ERROR: Access Denied', debugInfo);
-    this.emit('error', { message: "You have not joined this game" });
+    this.emit('error', { message: "你尚未加入这个房间" });
     return;
   }
 
@@ -150,7 +150,7 @@ const move = function (this: Socket, data: MoveData) {
   const game = DB?.find(data.gameID);
   if (!game) {
     console.log('ERROR: Game Not Found', debugInfo);
-    this.emit('error', { message: "Game not found" });
+    this.emit('error', { message: "房间不存在" });
     return;
   }
 
@@ -158,7 +158,7 @@ const move = function (this: Socket, data: MoveData) {
   const result = game.move(data.move);
   if (!result) {
     console.log('ERROR: Failed to Apply Move', debugInfo);
-    this.emit('error', { message: "Invalid move, please try again" });
+    this.emit('error', { message: "无效的走法，请重试" });
     return;
   }
 
@@ -184,7 +184,7 @@ const forfeit = function (this: Socket, gameID: string) {
   // Check if user has permission to access this game
   if (gameID !== sess.gameID) {
     console.log('ERROR: Access Denied', debugInfo);
-    this.emit('error', { message: "You have not joined this game" });
+    this.emit('error', { message: "你尚未加入这个房间" });
     return;
   }
 
@@ -192,7 +192,7 @@ const forfeit = function (this: Socket, gameID: string) {
   const game = DB?.find(gameID);
   if (!game) {
     console.log('ERROR: Game Not Found', debugInfo);
-    this.emit('error', { message: "Game not found" });
+    this.emit('error', { message: "房间不存在" });
     return;
   }
 
@@ -200,7 +200,7 @@ const forfeit = function (this: Socket, gameID: string) {
   const result = game.forfeit(sess);
   if (!result) {
     console.log('ERROR: Failed to Forfeit', debugInfo);
-    this.emit('error', { message: "Failed to forfeit game" });
+    this.emit('error', { message: "认输失败，请重试" });
     return;
   }
 

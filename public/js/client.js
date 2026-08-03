@@ -56,8 +56,54 @@ const init = (config) => {
     // Define board based on player's perspective
     boardRenderer.assignSquareIds(squares, playerColor);
 
+    // Add visual markers for special squares
+    initBoardMarkers(squares);
+
     // Attach event handlers
     attachDOMEventHandlers();
+};
+
+/**
+ * Add visual markers for bunker, headquarters, and railway squares.
+ */
+const initBoardMarkers = (squares) => {
+    const bunkerIds = ['b3','d3','c4','b5','d5','b8','d8','c9','b10','d10'];
+    const hqIds = ['b1','d1','b12','d12'];
+    const leftRailCols = ['a'];  // left rail column
+    const rightRailCols = ['e']; // right rail column
+    const railRows = ['2','3','4','5','6','7','8','9','10','11'];
+    const railTopRows = ['2','6','7'];  // top rail for these complete rows
+    const railBottomRows = ['6','7','11']; // bottom rail
+
+    squares.each(function() {
+        const id = $(this).attr('id');
+        if (!id) return;
+
+        // Bunker
+        if (bunkerIds.includes(id)) {
+            $(this).addClass('bunker');
+        }
+        // Headquarters
+        if (hqIds.includes(id)) {
+            $(this).addClass('hq');
+        }
+        // Railway - left/right columns
+        const col = id[0];
+        const row = id.slice(1);
+        if (leftRailCols.includes(col) && railRows.includes(row)) {
+            $(this).addClass('rail-left');
+        }
+        if (rightRailCols.includes(col) && railRows.includes(row)) {
+            $(this).addClass('rail-right');
+        }
+        // Railway - top/bottom rows
+        if (railTopRows.includes(row)) {
+            $(this).addClass('rail-top');
+        }
+        if (railBottomRows.includes(row)) {
+            $(this).addClass('rail-bottom');
+        }
+    });
 };
 
 const callbackHighlightSwap = (color, rank) => {

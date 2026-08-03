@@ -1,146 +1,322 @@
-body  { background-color: #f8f8f8; }
-table { border-collapse: collapse; }
+/* ============================================================
+   行军旗 (Junqi) - 全新 UI 样式
+   适配原有 DOM 结构（棋子通过 td CSS class 渲染）
+   ============================================================ */
 
-#banner { color: #ffffff; background-size: cover; background-image: url("../img/banner.jpg"); }
+:root {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-board: #d4a76a;
+  --bg-board-dark: #b89354;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-blue: #3b82f6;
+  --accent-red: #ef4444;
+  --accent-green: #22c55e;
+  --accent-purple: #8b5cf6;
+  --border-color: #334155;
+}
 
-#startForm, #joinForm { padding: 15px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-#game { width: 400px; margin: 0 auto 0 auto; }
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: -apple-system,'Segoe UI','PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
 
-/*
- * Title Bar
- */
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ========== 首页 ========== */
+.junqi-header {
+  background: linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+  border-bottom: 1px solid var(--border-color);
+  padding: 40px 20px 30px;
+  text-align: center;
+}
+
+.junqi-header h1 {
+  font-size: 2rem;
+  color: #fbbf24;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.junqi-header p {
+  color: var(--text-secondary);
+  font-size: .95rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.home-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.home-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.home-card h3 {
+  color: #fbbf24;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; color: var(--text-secondary); font-size: .85rem; margin-bottom: 4px; }
+
+.form-control {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #0f172a;
+  color: var(--text-primary);
+  font-size: .9rem;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.form-control:focus { border-color: var(--accent-blue); }
+select.form-control { cursor: pointer; }
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s,transform .1s;
+}
+
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--accent-blue); color: #fff; }
+.btn-primary:hover { background: #2563eb; }
+.btn-danger { background: var(--accent-red); color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-sm { padding: 6px 14px; font-size: .82rem; }
+.btn-secondary { background: #334155; color: var(--text-primary); }
+.btn-secondary:hover { background: #475569; }
+
+.btn-group { display: flex; gap: 8px; }
+.btn-group .btn { flex: 1; }
+.btn-group .btn.active { background: var(--accent-blue); color: #fff; }
+.btn-group .btn:not(.active) { background: #334155; color: var(--text-secondary); }
+
+/* ========== 游戏导航 ========== */
+.navbar {
+  background: #1e293b;
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand { color: #fbbf24; font-size: 1.1rem; font-weight: 500; }
+
+/* ========== 游戏布局 ========== */
+.game-container {
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 180px 1fr 180px;
+  gap: 12px;
+  align-items: start;
+}
+
+/* ========== 侧栏 ========== */
+.side-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.player-info .player-name {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.player-info .player-status { font-size: .82rem; color: var(--text-muted); }
+
+#you.active-player .player-name,
+#opponent.active-player .player-name { color: #fbbf24; }
+
+/* ========== 棋盘容器 ========== */
+.board-area { text-align: center; }
 
 #title-bar {
-  font-size: 18px;
-  line-height: 30px;
-  background-color: #f0f0f0;
-  padding:  3px 3px 3px 6px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin: 0 0 25px 0;
+  color: var(--text-secondary);
+  font-size: .85rem;
+  margin-bottom: 10px;
 }
 
-/*
- * Player Info
- */
+#title-bar strong { color: #fbbf24; }
 
-.player-info        { font-size: 16px; margin: 0 20px 0 20px;        }
-.player-info ul     { font-size: 26px; line-height: 28px; margin: 0; }
-.player-info ul li  { padding: 0;                                    }
-
-.active-player strong:before { color: #3a87ad; content: "\25b6  "; }
-.setup-player strong:before { color: grey; content: "(Setting Up...) "; }
-.ready-player strong:before { color: grey; content: "(Ready!) "; }
-
-/*
- * Game Board
- */
-
+/* ========== 棋盘 ========== */
 #board {
-    margin: 0 auto 0 auto;
-    background-image: url("../img/map.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-size: 340px 480px;
-    background-position: center;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: var(--bg-board);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.35);
 }
 
-#board .square {
-  width:  80px;
-  height: 40px;
-  font-size: 25px;
-  line-height: 35px;
-  text-align: center;
-  vertical-align: bottom;
-}
-
-#board .last-move {
-  box-shadow: inset 0 0 0 3px #8E55DF;
-  -moz-box-shadow: inset 0 0 0 3px #8E55DF;
-  -webkit-box-shadow: inset 0 0 0 3px #8E55DF;
-}
-
-#board .top-left-corner, #board .top-right-corner,
-#board .bottom-right-corner, #board .bottom-left-corner,
-#board .top-edge, #board .right-edge, #board .bottom-edge, #board .left-edge {
-  width: 40px;
-  height: 40px;
+#board td {
+  width: 66px;
+  height: 34px;
   text-align: center;
   vertical-align: middle;
+  padding: 0;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-
-#board .top-edge    { background: url("../img/board-edges.png") bottom; }
-#board .right-edge  { background: url("../img/board-edges.png") left;   }
-#board .bottom-edge { background: url("../img/board-edges.png") top;    }
-#board .left-edge   { background: url("../img/board-edges.png") right;  }
-
-#board .top-left-corner     { background: url("../img/board-corners.png") bottom right; }
-#board .top-right-corner    { background: url("../img/board-corners.png") bottom left;  }
-#board .bottom-right-corner { background: url("../img/board-corners.png") top left;     }
-#board .bottom-left-corner  { background: url("../img/board-corners.png") top right;    }
-
-#board .selected                        { border-style: solid; border-color: #049cdb; }
-#board .valid-move:before               { color: black; content: "\25cf"; }
-#board .valid-attack:before             { border-style: solid; border-color: black;  }
-#board .valid-swap:before               { border-style: solid; border-color: black;  }
-
-/*
- * Popup Windows
- */
-
-.modal-content { background-color: #f8f8f8; }
-.modal-footer  { margin-top: 0; }
-
-#pawn-promotion h3    { margin-bottom: 20px;                }
-#pawn-promotion label { font-size: 30px; line-height: 30px; }
-
-/*
- * Pieces
- */
-
-.facedown.blue:before {
-    content: "默认";
-    color: #3B5999;
-    background-color: #108FE8;
-    border-left: solid 1px #2E4476;
-    background: #3B5999;
-    -webkit-box-shadow: 0px 5px 0px 0px #2E4476;
-    box-shadow: 0px 5px 0px 0px #2E4476;
+/* 有效游戏格子 */
+#board td.square {
+  cursor: pointer;
+  border: 1px solid var(--bg-board-dark);
+  background: rgba(0,0,0,.04);
 }
 
-.facedown.red:before {
-    content: "默认";
-    color: #DE463B;
-    background-color: #DE463B;
-    border-left: solid 1px #C02B21;
-    -webkit-box-shadow: 0px 5px 0px 0px #C02B21;
-    box-shadow: 0px 5px 0px 0px #C02B21;
+/* 大本营 & 行营 - 由 JS 添�� bunker/hq class */
+#board td.square.bunker { background: rgba(139,92,246,.08); }
+#board td.square.hq { background: rgba(139,92,246,.15); border: 1px solid rgba(139,92,246,.25); }
+
+/* 铁路 - 由 JS 添加 rail class */
+#board td.square.rail-left { border-left: 3px solid #8b7355; }
+#board td.square.rail-right { border-right: 3px solid #8b7355; }
+#board td.square.rail-top { border-top: 3px solid #8b7355; }
+#board td.square.rail-bottom { border-bottom: 3px solid #8b7355; }
+
+/* ========== 棋子 ========== */
+/* 所有棋子通用圆形样式，使用伪元素渲染 */
+#board td.red::before, #board td.blue::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 2;
+  transition: transform .12s, box-shadow .15s;
+  pointer-events: none;
 }
 
-.blue.rank0:before   { content: "炸弹"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank1:before   { content: "司令"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank2:before   { content: "军长"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank3:before   { content: "师长"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank4:before   { content: "旅长"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank5:before   { content: "团长"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank6:before   { content: "营长"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank7:before   { content: "连长"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank8:before   { content: "排长"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank9:before   { content: "工兵"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank10:before   { content: "地雷"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
-.blue.rank11:before   { content: "军旗"; background-color: #108FE8;color: white;border-left: solid 1px #2E4476;background: #3B5999;-webkit-box-shadow: 0px 5px 0px 0px #2E4476;box-shadow: 0px 5px 0px 0px #2E4476; }
+#board td.red::before {
+  background: linear-gradient(135deg,#ef4444,#b91c1c);
+  color: #fff;
+  border: 2px solid #991b1b;
+  box-shadow: 0 2px 6px rgba(220,38,38,.4);
+}
 
-.red.rank0:before   { content: "炸弹"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank1:before   { content: "司令"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank2:before   { content: "军长"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank3:before   { content: "师长"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank4:before   { content: "旅长"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank5:before   { content: "团长"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank6:before   { content: "营长"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank7:before   { content: "连长"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank8:before   { content: "排长"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank9:before   { content: "工兵"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank10:before   { content: "地雷"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
-.red.rank11:before   { content: "军旗"; background-color: #DE463B;color: white;border-left: solid 1px #C02B21;-webkit-box-shadow: 0px 5px 0px 0px #C02B21;box-shadow: 0px 5px 0px 0px #C02B21;}
+#board td.blue::before {
+  background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color: #fff;
+  border: 2px solid #1e40af;
+  box-shadow: 0 2px 6px rgba(37,99,235,.4);
+}
+
+/* 棋子名映射 */
+td.red.rank0::before, td.blue.rank0::before { content: "💣炸"; font-size: 11px; }
+td.red.rank1::before  { content: "司令"; }  td.blue.rank1::before  { content: "司令"; }
+td.red.rank2::before  { content: "军长"; }  td.blue.rank2::before  { content: "军长"; }
+td.red.rank3::before  { content: "师长"; }  td.blue.rank3::before  { content: "师长"; }
+td.red.rank4::before  { content: "旅长"; }  td.blue.rank4::before  { content: "旅长"; }
+td.red.rank5::before  { content: "团长"; }  td.blue.rank5::before  { content: "团长"; }
+td.red.rank6::before  { content: "营长"; }  td.blue.rank6::before  { content: "营长"; }
+td.red.rank7::before  { content: "连长"; }  td.blue.rank7::before  { content: "连长"; }
+td.red.rank8::before  { content: "排长"; }  td.blue.rank8::before  { content: "排长"; }
+td.red.rank9::before  { content: "工兵"; }  td.blue.rank9::before  { content: "工兵"; }
+td.red.rank10::before { content: "💣雷"; font-size: 11px; } td.blue.rank10::before { content: "💣雷"; font-size: 11px; }
+td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::before { content: "🚩旗"; font-size: 11px; }
+
+/* 暗棋 */
+#board td.facedown::before {
+  content: "?" !important;
+  width: 50px !important;
+  height: 44px !important;
+  font-size: 18px !important;
+  background: #475569 !important;
+  color: #94a3b8 !important;
+  border: 2px solid #334155 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,.3) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  position: absolute !important;
+  top: 50% !important; left: 50% !important;
+  transform: translate(-50%,-50%) !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+/* 空位 */
+#board td.empty { cursor: pointer; }
+#board td.empty::before { display: none !important; }
+
+/* ========== 交互高亮 ========== */
+#board td.selected { background: rgba(251,191,36,.2) !important; }
+#board td.selected::before {
+  transform: translate(-50%,-50%) scale(1.1) !important;
+  box-shadow: 0 0 0 3px #fbbf24, 0 4px 12px rgba(251,191,36,.5) !important;
+}
+#board td.valid-move::before { box-shadow: 0 0 0 3px rgba(34,197,94,.7) !important; }
+#board td.valid-attack::before { box-shadow: 0 0 0 3px rgba(239,68,68,.7) !important; }
+#board td.valid-swap::before { box-shadow: 0 0 0 3px rgba(251,191,36,.6) !important; }
+#board td.last-move { background: rgba(139,92,246,.12) !important; }
+#board td.last-move::before { box-shadow: 0 0 0 3px var(--accent-purple) !important; }
+
+/* ========== 控制按钮 ========== */
+.game-controls { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+.game-controls .btn { flex: 1; max-width: 160px; }
+
+/* ========== 消息 ========== */
+#messages { max-width: 500px; margin: 12px auto; text-align: center; }
+#messages .alert { padding: 8px 16px; border-radius: 8px; font-size: .85rem; margin-bottom: 8px; }
+.alert-danger { background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3); color: #fca5a5; }
+.alert-success { background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.3); color: #86efac; }
+
+/* ========== Bootstrap 模态框覆盖 ========== */
+.modal-content { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 16px; }
+.modal-body { text-align: center; padding: 24px; }
+.modal-body h2 { font-size: 1.2rem; font-weight: 500; }
+.modal-body .alert { border: none; padding: 0; }
+.modal-body .alert-success { background: none; color: var(--accent-green); font-size: 1.3rem; }
+.modal-body .alert-danger { background: none; color: var(--accent-red); font-size: 1.3rem; }
+.modal-footer { border: none; text-align: center; padding: 0 24px 20px; justify-content: center; }
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .game-container { grid-template-columns: 1fr; max-width: 420px; }
+  .side-panel { display: none; }
+  #board td { width: 56px; height: 30px; font-size: 11px; }
+  #board td.red::before, #board td.blue::before,
+  #board td.facedown::before { width: 42px; height: 38px; font-size: 11px; }
+}

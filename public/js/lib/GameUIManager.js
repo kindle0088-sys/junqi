@@ -109,7 +109,7 @@ class GameUIManager {
     setPlayerName(container, player) {
         const name = container.find('strong');
         if (player.name) {
-            name.text(player.joined === false ? "..." : player.name);
+            name.text(player.joined === false ? "等待中..." : player.name);
         }
     }
 

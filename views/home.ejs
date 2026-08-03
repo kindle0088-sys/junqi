@@ -1,80 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Online Junqi</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="A real-time multi-player junqi app">
-        <meta name="author" content="">
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/styles.css" rel="stylesheet">
-    </head>
-    <body>
-        <div id="banner" class="jumbotron">
-            <div class="container">
-                <h1 style="color: white;">Online Junqi</h1>
-                <p>
-                    The game Junqi (军旗), which translates to "army chess", is a Chinese board game that can now be played directly in your browser. 
-                    The objective of the game is to capture your opponent's flag.
-                </p>
-            </div>
-        </div>
-        <div class="container">
-            <table class="table ">
-              <tbody>
-                                  <tr>
-                  <td><h3>Join Game</h3></td>
-                  <td>
-                      <form id="joinForm" action="/join" method="POST" role="form">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="gameID">Select a Game</label>
-                                       <!-- <input id="gameID" type="text" name="game-id" class="form-control"> -->
-                                        
-                                        <!-- Displays a list of games in session -->
-                                        <select class="form-control" name="game-id">
-                                            <% for (var i = 0; i < listIDs.length; i++) { %>
-                                                <option value='<%= listIDs[i] %>'><%= listIDs[i] %></option>
-                                              <% } %>
-                                        </select>
-                                    </div>
-                                </div>    
-                            </div>
-                        <button type="submit" class="btn btn-primary">Join Game</button>
-                    </form>
-                    </td>
-                </tr>
-                <tr>
-                  <td><h3>New Game</h3></td>
-                  <td>
-                      <form id="startForm" action="/start" method="POST" role="form">
-                          <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Play as</label>
-                                        <div>
-                                            <div data-toggle="buttons" class="btn-group">
-                                                <label class="btn btn-default active">
-                                                    <input type="radio" name="player-color" value="blue" checked="checked">Blue
-                                                </label>
-                                                <label class="btn btn-default">
-                                                    <input type="radio" name="player-color" value="red">Red
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>      
-                        <button type="submit" class="btn btn-primary">Start Game</button>
-                    </form>
-                    </td>
-                </tr>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>行军旗 - 在线对战</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="在线双人对战的军棋（行军旗）游戏">
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="junqi-header">
+    <h1>🎲 行军旗</h1>
+    <p>经典军棋在线对战 · 双人实时对弈 · 邀请好友一起玩</p>
+  </div>
 
-              </tbody>
-            </table> 
+  <div class="home-container">
+    <div class="home-card">
+      <h3>🎮 创建新房间</h3>
+      <form id="startForm" action="/start" method="POST">
+        <div class="form-group">
+          <label>选择阵营</label>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn active">
+              <input type="radio" name="player-color" value="blue" checked hidden> 蓝方
+            </label>
+            <label class="btn">
+              <input type="radio" name="player-color" value="red" hidden> 红方
+            </label>
+          </div>
         </div>
-        <script src="/js/jquery.min.js"></script>
-        <script src="/js/bootstrap.min.js"></script>
-    </body>
+        <button type="submit" class="btn btn-primary" style="width:100%">创建房间</button>
+      </form>
+    </div>
+
+    <div class="home-card">
+      <h3>🔗 加入已有房间</h3>
+      <form id="joinForm" action="/join" method="POST">
+        <div class="form-group">
+          <label>选择要加入的游戏</label>
+          <select class="form-control" name="game-id">
+            <% for (var i = 0; i < listIDs.length; i++) { %>
+            <option value='<%= listIDs[i] %>'><%= listIDs[i] %></option>
+            <% } %>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">加入游戏</button>
+      </form>
+    </div>
+
+    <div style="text-align:center;color:var(--text-muted);font-size:.82rem;margin-top:12px;">
+      基于开源项目 <a href="https://github.com/samuelyuan/online-junqi" target="_blank">online-junqi</a> 改进
+    </div>
+  </div>
+
+  <script src="/js/jquery.min.js"></script>
+  <script>
+    // Toggle active class on color buttons
+    $('.btn-group .btn').on('click', function() {
+      $(this).siblings().removeClass('active');
+      $(this).addClass('active');
+    });
+  </script>
+</body>
 </html>

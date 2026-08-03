@@ -1,87 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Online Junqi</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="A real-time multi-player junqi app">
-        <meta name="author" content="">
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/styles.css" rel="stylesheet">
-    </head>
-    <body>
-        <nav role="navigation" class="navbar navbar-inverse navbar-static-top">
-            <div class="navbar-header">
-                <a href="/" class="navbar-brand">Online Junqi</a>
-            </div>
-        </nav>
-        <div class="container">
-            <div id="messages"></div>
-            <div id="game">
-                <div id="title-bar">
-                    <span>Game:&nbsp;</span><strong><%= gameID %></strong>
-                    <div class="row">
-                    <div class="col-md-4">
-                        <button id="finishSetup" type="submit" class="btn btn-sm btn-default">Finish Setup</button>
-                    </div>
-                    <div class="col-md-4">
-                        <button id="forfeit" class="btn btn-sm btn-danger pull-right" data-toggle="modal" data-target="#forfeit-game">Surrender</button>
-                    </div>
-                </div>
-                </div>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>行军旗 · 对战</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="行军旗在线实时对战">
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">🎲 行军旗</a>
+    <span style="color:var(--text-muted);font-size:.82rem;">
+      房间: <strong style="color:#fbbf24;letter-spacing:1px;"><%= gameID %></strong>
+      <span id="copyRoomCode" style="cursor:pointer;color:var(--accent-blue);margin-left:6px;font-size:.78rem;" onclick="copyRoomCode()">📋 复制</span>
+    </span>
+  </nav>
 
-                <div id="opponent" class="player-info">
-                    <strong>...</strong>
-                    <span class="status pull-right"></span>
-                    <!-- <ul class="captured-pieces list-inline"></ul> -->
-                </div>
+  <div class="game-container">
+    <!-- 左侧：对手信息 -->
+    <div id="opponent-panel" class="side-panel">
+      <div id="opponent" class="player-info">
+        <strong class="player-name">等待对手...</strong>
+        <span class="player-status"></span>
+      </div>
+    </div>
 
-                <table id="board">
-                </table>
+    <!-- 中央：棋盘 -->
+    <div class="board-area">
+      <div id="title-bar">
+        房间 <strong><%= gameID %></strong>
+      </div>
 
-                <div id="you" class="player-info">
-                    <strong>...</strong>
-                    <span class="status pull-right"></span>
-                    <!-- <ul class="captured-pieces list-inline"></ul> -->
-                </div>
-            </div>
+      <div id="messages"></div>
 
-            <div id="game-over" role="dialog" class="modal fade">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                    <div class="modal-body text-center"><h2 class="alert"></h2></div><div class="modal-footer"><a href="/" class="btn btn-primary">Continue</a></div></div>
-                </div>
-            </div>
+      <div id="game">
+        <table id="board"></table>
 
-            <div id="forfeit-game" role="dialog" class="modal fade">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body text-center"><h2>Are you sure you want to surrender?</h2></div>
-                        <div class="modal-footer">
-                            <button id="cancel-forfeit" class="btn btn-default">Cancel</button>
-                            <button id="confirm-forfeit" class="btn btn-primary">Surrender</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="game-controls">
+          <button id="finishSetup" type="submit" class="btn btn-primary btn-sm">✅ 完成布阵</button>
+          <button id="forfeit" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#forfeit-game">🏳️ 认输</button>
         </div>
-        <script src="/js/jquery.min.js"></script>
-        <script src="/js/bootstrap.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script type="module" src="/js/lib/BoardRenderer.js"></script>
-        <script type="module" src="/js/client.js"></script>
-        <script src="/js/fastclick.js"></script>
-        <script type="module">
-            import Client from "/js/client.js";
+      </div>
+    </div>
 
-            $(document).ready(function() {
-                  FastClick.attach(document.body);
-                  Client({
-                    gameID      : '<%= gameID %>',
-                    playerColor : '<%= playerColor %>',
-                    playerName  : '<%= playerName %>'
-                  });
-            });
-        </script>
-    </body>
+    <!-- 右侧：己方信息 -->
+    <div id="you-panel" class="side-panel">
+      <div id="you" class="player-info">
+        <strong class="player-name">我方</strong>
+        <span class="player-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 游戏结束弹窗 -->
+  <div id="game-over" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h2 class="alert"></h2>
+        </div>
+        <div class="modal-footer">
+          <a href="/" class="btn btn-primary">返回大厅</a>
+          <button onclick="location.reload()" class="btn btn-secondary">再来一局</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 认输确认弹窗 -->
+  <div id="forfeit-game" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h2>确定要认输吗？</h2>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-forfeit" class="btn btn-secondary" data-dismiss="modal">取消</button>
+          <button id="confirm-forfeit" class="btn btn-danger">确认认输</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/lib/BoardRenderer.js"></script>
+  <script type="module" src="/js/client.js"></script>
+  <script src="/js/fastclick.js"></script>
+  <script type="module">
+    import Client from "/js/client.js";
+
+    $(document).ready(function() {
+      FastClick.attach(document.body);
+      Client({
+        gameID      : '<%= gameID %>',
+        playerColor : '<%= playerColor %>',
+        playerName  : '<%= playerName %>'
+      });
+    });
+
+    window.copyRoomCode = function() {
+      const code = '<%= gameID %>';
+      navigator.clipboard.writeText(code).then(() => {
+        const el = document.getElementById('copyRoomCode');
+        el.textContent = '✅ 已复制';
+        setTimeout(() => { el.textContent = '📋 复制'; }, 2000);
+      });
+    };
+  </script>
+</body>
 </html>

@@ -64,9 +64,9 @@ export class HttpRoutes {
       return null;
     }
 
-    // If Player Name consists only of whitespace, set as 'Player 1'
+    // If Player Name consists only of whitespace, set as '玩家 1'
     if (this.isWhitespace(req.body['player-name'])) {
-      req.body['player-name'] = 'Player 1';
+      req.body['player-name'] = '玩家 1';
     }
 
     return {
@@ -93,9 +93,9 @@ export class HttpRoutes {
       return null;
     }
 
-    // If Player Name consists only of whitespace, set as 'Player 2'
+    // If Player Name consists only of whitespace, set as '玩家 2'
     if (this.isWhitespace(req.body['player-name'])) {
-      req.body['player-name'] = 'Player 2';
+      req.body['player-name'] = '玩家 2';
     }
 
     return {
@@ -119,7 +119,7 @@ export class HttpRoutes {
    */
   game(req: AuthenticatedRequest, res: Express.Response): void {
 
-    req.session.playerName = "Anonymous";
+    req.session.playerName = "匿名玩家";
 
     // Validate session data
     var validData = this.validateGame(req);

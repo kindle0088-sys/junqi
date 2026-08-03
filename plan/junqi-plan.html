@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>行军旗（军棋）网页版 · 开发计划</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0f172a; color: #e2e8f0; font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Noto Sans SC', sans-serif; line-height: 1.7; padding: 40px 20px; }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 2.2rem; color: #fbbf24; margin-bottom: 4px; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 40px; }
+  h2 { font-size: 1.5rem; color: #60a5fa; margin-top: 48px; margin-bottom: 16px; border-bottom: 1px solid #1e293b; padding-bottom: 8px; }
+  h3 { font-size: 1.15rem; color: #a5b4fc; margin-top: 28px; margin-bottom: 10px; }
+  h4 { color: #c4b5fd; margin-top: 20px; margin-bottom: 6px; font-size: 1rem; }
+  p, li { color: #cbd5e1; }
+  p { margin-bottom: 12px; }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { margin-bottom: 6px; }
+  .highlight { background: #1e293b; border-left: 4px solid #60a5fa; padding: 14px 18px; border-radius: 6px; margin: 16px 0; font-size: 0.95rem; }
+  .highlight strong { color: #fbbf24; }
+  code { background: #1e293b; color: #f472b6; padding: 2px 8px; border-radius: 4px; font-size: 0.88rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+  pre { background: #0d1117; padding: 16px 20px; border-radius: 8px; overflow-x: auto; margin: 12px 0; font-size: 0.88rem; border: 1px solid #1e293b; }
+  pre code { background: none; padding: 0; color: #e2e8f0; }
+  .tag { display: inline-block; background: #1e293b; color: #93c5fd; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; margin-right: 6px; }
+  .tag.green { background: #064e3b; color: #6ee7b7; }
+  .tag.yellow { background: #422006; color: #fcd34d; }
+  .tag.red { background: #450a0a; color: #fca5a5; }
+  .tag.purple { background: #2e1065; color: #c4b5fd; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .card { background: #1e293b; border-radius: 8px; padding: 16px; }
+  .card h4 { color: #fbbf24; margin-top: 0; }
+  .timeline { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+  .timeline-item { display: flex; gap: 16px; align-items: flex-start; }
+  .timeline-num { background: #2563eb; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 0.9rem; }
+  .timeline-content { flex: 1; }
+  .timeline-content h4 { margin-top: 0; }
+  .board-demo { margin: 20px 0; text-align: center; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+  th, td { border: 1px solid #334155; padding: 10px 14px; text-align: left; }
+  th { background: #1e293b; color: #fbbf24; font-weight: 600; }
+  td { background: #0f172a; }
+  .emoji { font-style: normal; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🎲 行军旗（军棋）网页版 · 开��计划</h1>
+<p class="subtitle">2026-07-26 · 双人在线对战 · 巴迪 🐾 出品</p>
+
+<!-- ============================================================ -->
+<h2>1. 游戏规则确认</h2>
+
+<h3>1.1 棋盘结构</h3>
+<p>标准军棋棋盘，双方对称，中间以河流分隔。每方包含：</p>
+<ul>
+  <li><strong>兵站</strong>（×23）：棋子常规站位点</li>
+  <li><strong>行营</strong>（×5）：安全区，进入后不可被吃</li>
+  <li><strong>大本营</strong>（×2）：军旗的固定位置，进入后不可再移动</li>
+  <li><strong>铁路线</strong>（粗线）：直线可任意距离移动</li>
+  <li><strong>公路线</strong>（细线）：每次只能移动一格</li>
+</ul>
+
+<div class="highlight">
+<strong>⚠️ 本计划采用二人明棋规则</strong>（明棋 = 棋子亮明展开，无需翻棋阶段）<br>
+后续可扩展暗棋/翻棋模式。
+</div>
+
+<h3>1.2 棋子体系（每方25枚）</h3>
+<div class="grid-2">
+  <div class="card">
+    <h4>指挥层 · 1~9级</h4>
+    <table>
+      <tr><th>棋子</th><th>数量</th><th>等级</th></tr>
+      <tr><td>司令 🟥</td><td>1</td><td>9（最高）</td></tr>
+      <tr><td>军长 🟧</td><td>1</td><td>8</td></tr>
+      <tr><td>师长 🟨</td><td>2</td><td>7</td></tr>
+      <tr><td>旅长 🟩</td><td>2</td><td>6</td></tr>
+      <tr><td>团长 🔵</td><td>2</td><td>5</td></tr>
+      <tr><td>营长 🟪</td><td>2</td><td>4</td></tr>
+      <tr><td>连长 🟫</td><td>3</td><td>3</td></tr>
+      <tr><td>排长 ⬛</td><td>3</td><td>2</td></tr>
+      <tr><td>工兵 🔧</td><td>3</td><td>1（最低）</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>特殊棋子</h4>
+    <table>
+      <tr><th>棋子</th><th>数量</th><th>规则</th></tr>
+      <tr><td>💣 炸弹</td><td>2</td><td>与任何棋子同归于尽</td></tr>
+      <tr><td>⛰️ 地雷</td><td>3</td><td>不可移动，仅工兵可挖</td></tr>
+      <tr><td>🚩 军旗</td><td>1</td><td>不可移动，被吃即输</td></tr>
+    </table>
+  </div>
+</div>
+
+<h3>1.3 核心规则</h3>
+<ul>
+  <li><strong>吃子</strong>：高级吃低级，同级同归于尽</li>
+  <li><strong>炸弹</strong>：碰任何子都同归于尽（包括军旗）</li>
+  <li><strong>地雷</strong>：仅工兵能吃；其他子碰雷即死</li>
+  <li><strong>工兵</strong>：铁路线上可任意拐弯"飞行"；可挖地雷</li>
+  <li><strong>行营</strong>：进入后对方不可攻击，行营内每次走1格</li>
+  <li><strong>大本营</strong>：军旗必须放此处；进大本营后不可再移动</li>
+  <li><strong>铁路</strong>：非工兵棋子只能直线移动，不限步数</li>
+  <li><strong>公路</strong>：所有棋子每次只能移动1格</li>
+</ul>
+
+<h3>1.4 胜负判定</h3>
+<ol>
+  <li>吃掉对方 <strong>军旗</strong> → ���</li>
+  <li>对方 <strong>无棋可走</strong>（仅剩地雷+军旗）→ 胜</li>
+  <li>对方 <strong>认输/超时</strong> → 胜</li>
+</ol>
+
+<h3>1.5 初始布局约束</h3>
+<ul>
+  <li>军旗 → 必须放在己方 <strong>两个大本营之一</strong></li>
+  <li>地雷 → 只能放在己方阵地 <strong>最后两排</strong>（含大本营所在行）</li>
+  <li>炸弹 → 不放在第一排（可选规则，默认开启限制）</li>
+  <li>行营 → 初始不可放子</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>2. 技术架构</h2>
+
+<div class="highlight">
+<strong>选型原则</strong>：零框架依赖、学习成本低、可部署到免费托管。<br>
+前后端分离，后端 Node.js + WebSocket，前端纯 HTML/CSS/JS + Canvas。
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h4>🎨 前端</h4>
+    <ul>
+      <li>HTML + CSS（单页应用）</li>
+      <li>Canvas 2D 绘制棋盘</li>
+      <li>Socket.IO Client</li>
+      <li>无需 React/Vue</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>⚙️ 后端</h4>
+    <ul>
+      <li>Node.js + Express</li>
+      <li>Socket.IO（WebSocket）</li>
+      <li>纯内存状态（无需数据库）</li>
+      <li>单进程即可撑 100+ 对局</li>
+    </ul>
+  </div>
+</div>
+
+<h3>2.1 架构图</h3>
+<pre>
+┌─────────────────────────┐       ┌─────────────────────────┐
+│  浏览器 A (红方)         │       │  浏览器 B (蓝方)         │
+│  Canvas 棋盘             │       │  Canvas 棋盘             │
+│  Socket.IO Client        │       │  Socket.IO Client        │
+└────────┬────────────────┘       └────────┬────────────────┘
+         │ WebSocket                       │ WebSocket
+         └──────────────┬──────────────────┘
+                        ▼
+            ┌─────────────────────┐
+            │   Node.js 服务器     │
+            │                      │
+            │  ┌────────────────┐  │
+            │  │ Room 管理器     │  │  ← 创建/加入/解散房间
+            │  ├────────────────┤  │
+            │  │ 游戏引擎        │  │  ← 规则校验 + 状态管理
+            │  ├────────────────┤  │
+            │  │ 对战逻辑        │  │  ← 走子/吃子/胜负判定
+            │  └────────────────┘  │
+            └─────────────────────┘
+</pre>
+
+<h3>2.2 Server 是权威仲裁</h3>
+<p>所有走子合法性由服务端验证，客户端只负责展示和发送操作请求——防作弊。</p>
+
+<!-- ============================================================ -->
+<h2>3. 前后端模块拆分</h2>
+
+<h3>3.1 后端模块</h3>
+<table>
+  <tr><th>模块</th><th>职责</th><th>关键数据结构</th></tr>
+  <tr>
+    <td><code>server.js</code></td>
+    <td>HTTP 服务 + Socket.IO 入口</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td><code>room-manager.js</code></td>
+    <td>房间创建、加入、退出、列表</td>
+    <td><code>Map&lt;roomId, Room&gt;</code></td>
+  </tr>
+  <tr>
+    <td><code>game-engine.js</code></td>
+    <td>核心规则引擎：走子、吃子、胜负判</td>
+    <td><code>GameState</code> 对象</td>
+  </tr>
+  <tr>
+    <td><code>board-def.js</code></td>
+    <td>棋盘拓扑定义：坐标、连接关系</td>
+    <td>静态 JSON 图谱</td>
+  </tr>
+  <tr>
+    <td><code>piece-def.js</code></td>
+    <td>棋子类型、等级、数量定义</td>
+    <td>常量对象</td>
+  </tr>
+</table>
+
+<h3>3.2 前端模块</h3>
+<table>
+  <tr><th>文件</th><th>职责</th></tr>
+  <tr><td><code>index.html</code></td><td>页面骨架 + 样式</td></tr>
+  <tr><td><code>game-client.js</code></td><td>Socket 通信层 + UI 事件绑定</td></tr>
+  <tr><td><code>board-renderer.js</code></td><td>Canvas 绘制棋盘、棋子、选中高亮</td></tr>
+  <tr><td><code>board-def.js</code></td><td>前端版棋盘拓扑（与后端一致）</td></tr>
+  <tr><td><code>ui-controller.js</code></td><td>菜单、房间列表、提示信息控制</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>4. 网络协议设计</h2>
+
+<h3>4.1 Socket.IO 事件表</h3>
+<table>
+  <tr><th>方向</th><th>事件</th><th>数据</th><th>说明</th></tr>
+  <tr><td>C→S</td><td><code>create_room</code></td><td><code>{ playerName }</code></td><td>创建新房间</td></tr>
+  <tr><td>S→C</td><td><code>room_created</code></td><td><code>{ roomId, players[] }</code></td><td>返回房间 ID</td></tr>
+  <tr><td>C→S</td><td><code>join_room</code></td><td><code>{ roomId, playerName }</code></td><td>加入已有房间</td></tr>
+  <tr><td>S→C</td><td><code>room_joined</code></td><td><code>{ roomId, players[], side }</code></td><td>确认加入，分配阵营</td></tr>
+  <tr><td>S→C</td><td><code>game_start</code></td><td><code>{ board }</code></td><td>双方就绪，开始游戏</td></tr>
+  <tr><td>C→S</td><td><code>make_move</code></td><td><code>{ from, to }</code></td><td>走子请求</td></tr>
+  <tr><td>S→C</td><td><code>move_result</code></td><td><code>{ success, from, to, captured, board, currentTurn }</code></td><td>行动结果广播</td></tr>
+  <tr><td>S→C</td><td><code>game_over</code></td><td><code>{ winner, reason }</code></td><td>游戏结束</td></tr>
+  <tr><td>C→S</td><td><code>resign</code></td><td>-</td><td>认输</td></tr>
+  <tr><td>C→S</td><td><code>chat</code></td><td><code>{ message }</code></td><td>聊天（可选）</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>5. 数据结构设计</h2>
+
+<h3>5.1 核心数据结构</h3>
+<pre><code>// 棋盘位置
+{ row: 0-4, col: 0-4 }  // 每方 5行×？列（根据实际棋盘拓扑）
+
+// 棋子
+{
+  id: 'r_commander',     // 唯一ID
+  type: 'commander',     // 棋子类型
+  rank: 9,               // 等级（1-9，炸弹=0，地雷=0，军旗=-1）
+  side: 'red'|'blue',    // 阵营
+  label: '司令',          // 显示名称
+  icon: '🟥',            // 图标（或简写字符）
+  movable: true,         // 是否可移动
+  position: { row, col } // 当前位置
+}
+
+// 游戏状态
+{
+  roomId: 'abc123',
+  players: [
+    { id: 'socket1', name: '玩家A', side: 'red' },
+    { id: 'socket2', name: '玩家B', side: 'blue' }
+  ],
+  board: [],             // 所有棋子
+  currentTurn: 'red',    // 当��轮到谁
+  phase: 'placement' | 'playing' | 'finished',
+  winner: null,
+  moveHistory: []
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>6. UI/UX 方案</h2>
+
+<h3>6.1 页面流程</h3>
+<pre>
+┌─────────────────────────────────────────┐
+│  首页（输入昵称 → 创建/加入房间）         │
+├─────────────────────────────────────────┤
+│  房间大厅（等待对手 / 显示对方信息）       │
+├─────────────────────────────────────────┤
+│  对局界面（棋盘 + 操作面板）              │
+│  ┌────────────────────┐ ┌────────────┐  │
+│  │    Canvas 棋盘      │ │  信息面板   │  │
+│  │    - 铁路/公路线    │ │  - 当前轮次 │  │
+│  │    - 行营/大本营    �� │  - 吃子记录 │  │
+│  │    - 棋子图形       │ │  - 聊天     │  │
+│  │    - 选中高亮       │ │  - 认输按钮 │  │
+│  └────────────────────┘ └────────────┘  │
+├─────────────────────────────────────────┤
+│  结算界面（胜/负 + 再来一局）             │
+└─────────────────────────────────────────┘
+</pre>
+
+<h3>6.2 棋盘视觉设计</h3>
+<ul>
+  <li>采用 2D Canvas 绘制，自顶向下俯视棋盘</li>
+  <li>铁路线用粗线 + 公路线用细线</li>
+  <li>行营用菱形标记</li>
+  <li>大本营用旗帜标记</li>
+  <li>棋子显示为圆形，内含中文+等级数字</li>
+  <li>红方在下（近端），蓝方在上（远端）</li>
+</ul>
+
+<h3>6.3 交互设���</h3>
+<ol>
+  <li><strong>点击棋子</strong> → 选中，高亮显示可移动位置</li>
+  <li><strong>点击目标位置</strong> → 发送走子请求</li>
+  <li><strong>吃子时</strong> → 简短动画效果，显示被吃棋子</li>
+  <li><strong>回合切换</strong> → 轮到自己时有视觉提示</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2>7. 分阶段实施路线</h2>
+
+<div class="timeline">
+
+<div class="timeline-item">
+  <div class="timeline-num">1</div>
+  <div class="timeline-content">
+    <h4>棋盘渲染 + 棋子布局</h4>
+    <p><span class="tag green">前端</span> 完成 Canvas 棋盘绘制：铁路线、公路线、行营、大本营。<br>
+    静态摆放所有棋子（红蓝双方各25枚），实现基本渲染。</p>
+  </div>
+</div>
+
+<div class="timeline-item">
+  <div class="timeline-num">2</div>
+  <div class="timeline-content">
+    <h4>单人走子逻辑</h4>
+    <p><span class="tag green">前端</span> <span class="tag purple">后端</span> 实现：<br>
+    - 棋盘拓扑（位置连接图）<br>
+    - 走子规则（铁路直线/公路1格）<br>
+    - 工兵特殊行走（铁路可拐弯）<br>
+    - 行营/大本营移动限制<br>
+    先做成单机可走子的 demo。</p>
+  </div>
+</div>
+
+<div class="timeline-item">
+  <div class="timeline-num">3</div>
+  <div class="timeline-content">
+    <h4>吃子 + 胜负判定</h4>
+    <p><span class="tag purple">后端</span> 实现完整规则引擎：<br>
+    - 等级吃子逻辑（含同级同尽）<br>
+    - 炸弹同归于尽<br>
+    - 地雷仅工兵可挖<br>
+    - 军旗被吃/无棋可走判定<br>
+    此时可做单人 vs AI（简易随机走子）来测试规则。</p>
+  </div>
+</div>
+
+<div class="timeline-item">
+  <div class="timeline-num">4</div>
+  <div class="timeline-content">
+    <h4>WebSocket 联机对战</h4>
+    <p><span class="tag purple">后端</span> 实现：<br>
+    - Room 管理器（创建/加入/列表/退出）<br>
+    - Socket.IO 事件绑定<br>
+    - 服务端权威仲裁（所有规则在服务端跑，客户端只展示）<br>
+    - 回合同步、网络断开处理</p>
+  </div>
+</div>
+
+<div class="timeline-item">
+  <div class="timeline-num">5</div>
+  <div class="timeline-content">
+    <h4>全流程联调 + 打磨</h4>
+    <p><span class="tag green">前端</span> <span class="tag purple">后端</span> <span class="tag yellow">综合</span><br>
+    - 连接全流程（创建房间 → 加入房间 → 开始对局 → 结束）<br>
+    - 连接状态指示、重连逻辑<br>
+    - 超时/认输处理<br>
+    - UI 体验打磨（动画、音效提示、响应式布局）</p>
+  </div>
+</div>
+
+<div class="timeline-item">
+  <div class="timeline-num">6</div>
+  <div class="timeline-content">
+    <h4>部署上线（可选）</h4>
+    <p><span class="tag yellow">部署</span> 部署到 CloudStudio 或 Vercel + Render 等免费服务，给个链接就能和朋友直接玩。</p>
+  </div>
+</div>
+
+</div>
+
+<!-- ============================================================ -->
+<h2>8. 技术栈清单</h2>
+<table>
+  <tr><th>分类</th><th>技术</th><th>版本</th></tr>
+  <tr><td>运行环境</td><td>Node.js</td><td>≥ 18</td></tr>
+  <tr><td>Web 框架</td><td>Express</td><td>4.x</td></tr>
+  <tr><td>实时通信</td><td>Socket.IO</td><td>4.x</td></tr>
+  <tr><td>前端绘制</td><td>Canvas 2D API</td><td>原生</td></tr>
+  <tr><td>代码管理</td><td>Git</td><td>-</td></tr>
+  <tr><td>部署（可选）</td><td>CloudStudio / Render</td><td>-</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>9. 预估工作量</h2>
+<div class="grid-2">
+  <div class="card">
+    <h4>代码量估算</h4>
+    <ul>
+      <li>后端规则引擎：~400 行</li>
+      <li>后端网络层：~250 行</li>
+      <li>前端棋盘渲染：~500 行</li>
+      <li>前端网络+UI：~300 行</li>
+      <li>HTML+CSS：~200 行</li>
+      <li><strong>总计：~1,650 行</strong></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>开发节奏建议</h4>
+    <ul>
+      <li>阶段 1-2：2~3 小时</li>
+      <li>阶段 3：2 小时</li>
+      <li>阶段 4：2~3 小时</li>
+      <li>阶段 5：1~2 小时</li>
+      <li><strong>总计：~8~10 小时</strong></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

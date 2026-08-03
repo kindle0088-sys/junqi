@@ -128,16 +128,16 @@ export const RANK_HIDDEN = 'hidden';
 // Error messages
 export const ERROR_MESSAGES = {
     HANDSHAKE_UNAUTHORIZED: 'handshake unauthorized',
-    CLIENT_CONNECTION_FAILED: 'Client connection failed'
+    CLIENT_CONNECTION_FAILED: '客户端连接失败'
 };
 
 // Game over messages (matching GameUIManager structure)
 export const GAME_OVER_MESSAGES = {
-    [GAME_OVER_TYPES.CHECKMATE_WIN]: ['alert-success', 'Captured Flag'],
-    [GAME_OVER_TYPES.CHECKMATE_LOSE]: ['alert-danger', 'Flag Lost'],
-    [GAME_OVER_TYPES.FORFEIT_WIN]: ['alert-success', 'Your opponent has surrendered'],
-    [GAME_OVER_TYPES.FORFEIT_LOSE]: ['alert-danger', 'You have surrendered'],
-    [GAME_OVER_TYPES.NOPIECES_WIN]: ['alert-success', 'Your opponent has no moveable pieces'],
-    [GAME_OVER_TYPES.NOPIECES_LOSE]: ['alert-danger', 'You have no moveable pieces left'],
+    [GAME_OVER_TYPES.CHECKMATE_WIN]: ['alert-success', '🎉 你赢了！成功吃掉对方军旗！'],
+    [GAME_OVER_TYPES.CHECKMATE_LOSE]: ['alert-danger', '😔 军旗被吃，你输了'],
+    [GAME_OVER_TYPES.FORFEIT_WIN]: ['alert-success', '🎉 对方认输了！'],
+    [GAME_OVER_TYPES.FORFEIT_LOSE]: ['alert-danger', '🏳️ 你已认输'],
+    [GAME_OVER_TYPES.NOPIECES_WIN]: ['alert-success', '🎉 对方无棋可走，你赢了！'],
+    [GAME_OVER_TYPES.NOPIECES_LOSE]: ['alert-danger', '😔 无棋可走，你输了'],
 };
 
