@@ -8,6 +8,9 @@
   --bg-card: #1e293b;
   --bg-board: #d4a76a;
   --bg-board-dark: #b89354;
+  --wood-light: #e0b877;
+  --wood-dark: #c08a4e;
+  --wood-line: #a06f3c;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -21,7 +24,12 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg-page);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(59,130,246,.16), transparent 60%),
+    radial-gradient(900px 500px at 85% 110%, rgba(139,92,246,.12), transparent 60%),
+    radial-gradient(700px 400px at 10% 105%, rgba(251,191,36,.06), transparent 60%),
+    var(--bg-page);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: -apple-system,'Segoe UI','PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
   min-height: 100vh;
@@ -166,6 +174,56 @@ select.form-control { cursor: pointer; }
 #you.active-player .player-name,
 #opponent.active-player .player-name { color: #fbbf24; }
 
+/* 战果（吃掉棋子）清单 */
+.captures-panel {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+.captures-panel h4 {
+  font-size: .78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.captures-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 26px;
+}
+.capture-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,.35);
+  box-shadow: 0 2px 5px rgba(0,0,0,.35);
+  animation: popIn .3s ease;
+}
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.capture-chip.cap-red {
+  background: linear-gradient(145deg,#f87171,#ef4444 45%,#b91c1c);
+}
+.capture-chip.cap-blue {
+  background: linear-gradient(145deg,#60a5fa,#3b82f6 45%,#1d4ed8);
+}
+.captures-empty {
+  color: var(--text-muted);
+  font-size: .78rem;
+  padding: 4px 0;
+}
+
 /* ========== 棋盘容器 ========== */
 .board-area { text-align: center; }
 
@@ -177,14 +235,53 @@ select.form-control { cursor: pointer; }
 
 #title-bar strong { color: #fbbf24; }
 
+/* ========== 回合状态条 ========== */
+.turn-banner {
+  max-width: 500px;
+  margin: 10px auto 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: background .3s, border-color .3s, color .3s;
+}
+.turn-banner.turn-mine {
+  background: rgba(251,191,36,.12);
+  border-color: rgba(251,191,36,.4);
+  color: #fbbf24;
+}
+.turn-banner.turn-opponent {
+  background: rgba(99,102,241,.1);
+  border-color: rgba(99,102,241,.35);
+  color: #a5b4fc;
+}
+.turn-banner.turn-setup {
+  background: rgba(34,197,94,.1);
+  border-color: rgba(34,197,94,.35);
+  color: #86efac;
+}
+.turn-banner.turn-over {
+  background: rgba(239,68,68,.1);
+  border-color: rgba(239,68,68,.35);
+  color: #fca5a5;
+}
+
 /* ========== 棋盘 ========== */
 #board {
   margin: 0 auto;
   border-collapse: collapse;
-  background: var(--bg-board);
-  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.05) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.04) 0 2px, transparent 2px 18px),
+    linear-gradient(135deg, var(--wood-light) 0%, var(--bg-board) 55%, var(--wood-dark) 100%);
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,.35);
+  box-shadow: 0 10px 40px rgba(0,0,0,.5), inset 0 0 0 3px rgba(120,80,40,.35), inset 0 0 40px rgba(120,80,40,.25);
+  border: 1px solid rgba(120,80,40,.4);
 }
 
 #board td {
@@ -201,19 +298,22 @@ select.form-control { cursor: pointer; }
 /* 有效游戏格子 */
 #board td.square {
   cursor: pointer;
-  border: 1px solid var(--bg-board-dark);
-  background: rgba(0,0,0,.04);
+  border: 1px solid rgba(120,80,40,.3);
+  background: rgba(255,255,255,.05);
+  transition: background .12s;
 }
+
+#board td.square:hover { background: rgba(255,255,255,.12); }
 
 /* 大本营 & 行营 - 由 JS 添�� bunker/hq class */
 #board td.square.bunker { background: rgba(139,92,246,.08); }
 #board td.square.hq { background: rgba(139,92,246,.15); border: 1px solid rgba(139,92,246,.25); }
 
 /* 铁路 - 由 JS 添加 rail class */
-#board td.square.rail-left { border-left: 3px solid #8b7355; }
-#board td.square.rail-right { border-right: 3px solid #8b7355; }
-#board td.square.rail-top { border-top: 3px solid #8b7355; }
-#board td.square.rail-bottom { border-bottom: 3px solid #8b7355; }
+#board td.square.rail-left { border-left: 3px solid var(--wood-line); }
+#board td.square.rail-right { border-right: 3px solid var(--wood-line); }
+#board td.square.rail-top { border-top: 3px solid var(--wood-line); }
+#board td.square.rail-bottom { border-bottom: 3px solid var(--wood-line); }
 
 /* ========== 棋子 ========== */
 /* 所有棋子通用圆形样式，使用伪元素渲染 */
@@ -230,22 +330,41 @@ select.form-control { cursor: pointer; }
   top: 50%; left: 50%;
   transform: translate(-50%,-50%);
   z-index: 2;
-  transition: transform .12s, box-shadow .15s;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+}
+
+/* 棋子立体光泽（顶部高光） */
+#board td.red::after, #board td.blue::after {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 50px; height: 44px;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.35), rgba(255,255,255,0) 45%);
+  z-index: 3;
   pointer-events: none;
 }
 
 #board td.red::before {
-  background: linear-gradient(135deg,#ef4444,#b91c1c);
+  background: linear-gradient(145deg,#f87171,#ef4444 45%,#b91c1c);
   color: #fff;
   border: 2px solid #991b1b;
-  box-shadow: 0 2px 6px rgba(220,38,38,.4);
+  box-shadow: 0 3px 8px rgba(220,38,38,.45), inset 0 -3px 6px rgba(0,0,0,.25);
 }
 
 #board td.blue::before {
-  background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+  background: linear-gradient(145deg,#60a5fa,#3b82f6 45%,#1d4ed8);
   color: #fff;
   border: 2px solid #1e40af;
-  box-shadow: 0 2px 6px rgba(37,99,235,.4);
+  box-shadow: 0 3px 8px rgba(37,99,235,.45), inset 0 -3px 6px rgba(0,0,0,.25);
+}
+
+#board td.red:hover::before, #board td.blue:hover::before {
+  transform: translate(-50%,-50%) scale(1.06);
+  filter: brightness(1.08);
 }
 
 /* 棋子名映射 */
@@ -288,15 +407,37 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
 #board td.empty::before { display: none !important; }
 
 /* ========== 交互高亮 ========== */
-#board td.selected { background: rgba(251,191,36,.2) !important; }
+#board td.selected { background: rgba(251,191,36,.25) !important; }
 #board td.selected::before {
-  transform: translate(-50%,-50%) scale(1.1) !important;
-  box-shadow: 0 0 0 3px #fbbf24, 0 4px 12px rgba(251,191,36,.5) !important;
+  transform: translate(-50%,-50%) scale(1.12) !important;
+  box-shadow: 0 0 0 3px #fbbf24, 0 6px 16px rgba(251,191,36,.55) !important;
+  filter: brightness(1.1) !important;
 }
-#board td.valid-move::before { box-shadow: 0 0 0 3px rgba(34,197,94,.7) !important; }
-#board td.valid-attack::before { box-shadow: 0 0 0 3px rgba(239,68,68,.7) !important; }
+
+/* 可走位绿点脉冲动画 */
+@keyframes validPulse {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,.55); }
+  70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+#board td.valid-move::before {
+  animation: validPulse 1.6s ease-out infinite;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.7) !important;
+}
+
+/* 可攻击红点脉冲 */
+@keyframes attackPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239,68,68,.6); }
+  70% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+  100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+}
+#board td.valid-attack::before {
+  animation: attackPulse 1.4s ease-out infinite;
+  box-shadow: 0 0 0 3px rgba(239,68,68,.7) !important;
+}
+
 #board td.valid-swap::before { box-shadow: 0 0 0 3px rgba(251,191,36,.6) !important; }
-#board td.last-move { background: rgba(139,92,246,.12) !important; }
+#board td.last-move { background: rgba(139,92,246,.14) !important; }
 #board td.last-move::before { box-shadow: 0 0 0 3px var(--accent-purple) !important; }
 
 /* ========== 控制按钮 ========== */

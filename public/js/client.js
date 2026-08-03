@@ -21,6 +21,13 @@ let gameID = null;
 let playerColor = null;
 let gameClasses = null;
 
+// 军衔等级 → 中文名（与 CSS 棋子名映射一致）
+const RANK_LABELS = {
+    0: '炸', 1: '司机', 2: '军长', 3: '师长', 4: '旅长',
+    5: '团长', 6: '营长', 7: '连长', 8: '排长', 9: '工兵',
+    10: '雷', 11: '旗'
+};
+
 const boardRenderer = new BoardRenderer();
 const socketManager = new SocketManager();
 const uiManager = new GameUIManager();
@@ -236,6 +243,67 @@ const identifyPlayers = (gameState, playerColor) => {
 };
 
 /**
+ * 渲染"已吃对手"棋子清单
+ * @param {Array} capturedPieces - 我吃掉的对方棋子（含 colorChar / rank）
+ */
+const renderCapturedPieces = (capturedPieces) => {
+    const container = document.getElementById('you-captures');
+    if (!container) return;
+
+    const pieces = capturedPieces || [];
+    if (pieces.length === 0) {
+        container.innerHTML = '<span class="captures-empty">暂无战果</span>';
+        return;
+    }
+
+    // 按吃子顺序展示（最新在前）
+    const reversed = [...pieces].reverse();
+    container.innerHTML = reversed.map(p => {
+        const colorClass = p.colorChar === 'r' ? 'cap-red' : 'cap-blue';
+        const label = RANK_LABELS[p.rank] !== undefined ? RANK_LABELS[p.rank] : p.rank;
+        return `<span class="capture-chip ${colorClass}" title="吃掉了对方的${label}">${label}</span>`;
+    }).join('');
+};
+
+/**
+ * 更新回合状态条
+ * @param {Object} gameState - 游戏状态
+ * @param {string} activeColor - 当前行动方颜色
+ */
+const updateTurnBanner = (gameState, activeColor) => {
+    const banner = document.getElementById('turn-banner');
+    const text = document.getElementById('turn-text');
+    if (!banner || !text) return;
+
+    const you = gameState.players.find(p => p.color === playerColor);
+    const opponent = gameState.players.find(p => p.color !== playerColor);
+
+    // 布阵阶段
+    if (gameState.status === 'pending') {
+        if (you && you.isSetup === false) {
+            banner.className = 'turn-banner turn-setup';
+            text.textContent = '布阵中 · 点击棋子交换位置，然后完成布阵';
+        } else if (opponent && opponent.isSetup === false) {
+            banner.className = 'turn-banner turn-opponent';
+            text.textContent = '等待对手布阵…';
+        } else {
+            banner.className = 'turn-banner turn-setup';
+            text.textContent = '双方就绪，即将开始！';
+        }
+        return;
+    }
+
+    // 对局进行中
+    if (activeColor === playerColor) {
+        banner.className = 'turn-banner turn-mine';
+        text.textContent = '⚡ 轮到你了，请行动！';
+    } else {
+        banner.className = 'turn-banner turn-opponent';
+        text.textContent = '对方思考中…';
+    }
+};
+
+/**
  * Update UI from game state
  */
 const update = () => {
@@ -243,6 +311,12 @@ const update = () => {
 
     // Update player info
     uiManager.updatePlayerPanels(gameState.players, activeColor, gameState.status);
+
+    // Update captured pieces (the ones I've eaten from opponent)
+    renderCapturedPieces(gameState.capturedPieces);
+
+    // Update turn banner
+    updateTurnBanner(gameState, activeColor);
 
     // Update board
     uiManager.renderBoard(gameState.board, playerColor, gameState, boardRenderer, gameClasses);
