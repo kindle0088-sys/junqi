@@ -235,6 +235,44 @@ select.form-control { cursor: pointer; }
 
 #title-bar strong { color: #fbbf24; }
 
+/* 顶栏信息：执子颜色 + 双方棋子数 */
+#game-info { font-size: .88rem; color: var(--text-secondary); }
+#game-info .info-color-red { color: #f87171; }
+#game-info .info-color-blue { color: #60a5fa; }
+#game-info .info-num { color: #fbbf24; font-size: .95rem; }
+#game-info .info-sep { margin: 0 8px; color: var(--text-muted); }
+
+/* ========== 顶部胜负标语 ========== */
+.game-result {
+  max-width: 500px;
+  margin: 8px auto 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  animation: resultPop .35s ease;
+}
+.game-result.result-win {
+  color: #fbbf24;
+  background: rgba(251,191,36,.12);
+  border: 1.5px solid rgba(251,191,36,.5);
+  box-shadow: 0 0 24px rgba(251,191,36,.15), inset 0 0 24px rgba(251,191,36,.06);
+  text-shadow: 0 0 12px rgba(251,191,36,.35);
+}
+.game-result.result-lose {
+  color: #fca5a5;
+  background: rgba(239,68,68,.1);
+  border: 1.5px solid rgba(239,68,68,.4);
+  box-shadow: 0 0 24px rgba(239,68,68,.12), inset 0 0 24px rgba(239,68,68,.05);
+}
+@keyframes resultPop {
+  0% { transform: scale(.85); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* ========== 回合状态条 ========== */
 .turn-banner {
   max-width: 500px;

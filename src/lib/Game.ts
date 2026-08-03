@@ -82,7 +82,8 @@ export class Game {
             activePlayer: this.activePlayer,
             players: this.players,
             capturedPieces: playerColor ?
-                this.capturedPieces.filter(p => p.colorChar === playerColor) :
+                // 显示"我吃掉的对方棋子"（被吃棋子颜色 ≠ 我的颜色）
+                this.capturedPieces.filter(p => p.colorChar !== playerColor[0]) :
                 this.capturedPieces,
             validMoves: this.validMoves,
             validSwap: this.validSwap,

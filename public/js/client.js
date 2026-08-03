@@ -306,6 +306,42 @@ const updateTurnBanner = (gameState, activeColor) => {
 };
 
 /**
+ * 更新顶栏信息：执子颜色 + 双方存活棋子数
+ */
+const updateGameInfo = (gameState) => {
+    const el = document.getElementById('game-info');
+    if (!el) return;
+
+    // 统计双方存活棋子数
+    let mine = 0, theirs = 0;
+    Object.values(gameState.board || {}).forEach(piece => {
+        if (!piece) return;
+        if (piece.colorChar === playerColor[0]) mine++;
+        else theirs++;
+    });
+
+    const colorName = playerColor === 'red' ? '红方' : '蓝方';
+    el.innerHTML = `你执 <strong class="info-color-${playerColor}">${colorName}</strong>
+        <span class="info-sep">·</span>
+        我方 <strong class="info-num">${mine}</strong> 子
+        <span class="info-sep">·</span>
+        对方 <strong class="info-num">${theirs}</strong> 子`;
+};
+
+/**
+ * 顶部加粗显示胜负标语
+ * @param {string} text - 标语内容
+ * @param {string} type - 'win' | 'lose'
+ */
+const showGameResultBanner = (text, type) => {
+    const el = document.getElementById('game-result');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'game-result ' + (type === 'win' ? 'result-win' : 'result-lose');
+    el.textContent = text;
+};
+
+/**
  * Update UI from game state
  */
 const update = () => {
@@ -320,6 +356,9 @@ const update = () => {
     // Update turn banner
     updateTurnBanner(gameState, activeColor);
 
+    // Update top info bar (my color + pieces left)
+    updateGameInfo(gameState);
+
     // Update board
     uiManager.renderBoard(gameState.board, playerColor, gameState, boardRenderer, gameClasses);
 
@@ -331,20 +370,20 @@ const update = () => {
 
     // Test for checkmate
     if (gameState.status === GAME_STATUS.CHECKMATE) {
-        if (opponent.inCheck) { uiManager.showGameOver(GAME_OVER_TYPES.CHECKMATE_WIN); }
-        if (you.inCheck) { uiManager.showGameOver(GAME_OVER_TYPES.CHECKMATE_LOSE); }
+        if (opponent.inCheck) { uiManager.showGameOver(GAME_OVER_TYPES.CHECKMATE_WIN); showGameResultBanner('🎉 你赢了！成功吃掉对方军旗！', 'win'); }
+        if (you.inCheck) { uiManager.showGameOver(GAME_OVER_TYPES.CHECKMATE_LOSE); showGameResultBanner('😔 军旗被吃，你输了', 'lose'); }
     }
 
     // Test for stalemate
     if (gameState.status === GAME_STATUS.NOPIECES) {
-        if (!opponent.hasMoveablePieces) { uiManager.showGameOver(GAME_OVER_TYPES.NOPIECES_WIN); }
-        if (!you.hasMoveablePieces) { uiManager.showGameOver(GAME_OVER_TYPES.NOPIECES_LOSE); }
+        if (!opponent.hasMoveablePieces) { uiManager.showGameOver(GAME_OVER_TYPES.NOPIECES_WIN); showGameResultBanner('🎉 对方无棋可走，你赢了！', 'win'); }
+        if (!you.hasMoveablePieces) { uiManager.showGameOver(GAME_OVER_TYPES.NOPIECES_LOSE); showGameResultBanner('😔 无棋可走，你输了', 'lose'); }
     }
 
     // Test for forfeit
     if (gameState.status === GAME_STATUS.FORFEIT) {
-        if (opponent.forfeited) { uiManager.showGameOver(GAME_OVER_TYPES.FORFEIT_WIN); }
-        if (you.forfeited) { uiManager.showGameOver(GAME_OVER_TYPES.FORFEIT_LOSE); }
+        if (opponent.forfeited) { uiManager.showGameOver(GAME_OVER_TYPES.FORFEIT_WIN); showGameResultBanner('🎉 对方认输了！', 'win'); }
+        if (you.forfeited) { uiManager.showGameOver(GAME_OVER_TYPES.FORFEIT_LOSE); showGameResultBanner('🏳️ 你已认输', 'lose'); }
     }
 };
 
