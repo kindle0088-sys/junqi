@@ -195,7 +195,9 @@ export class HttpRoutes {
       }
 
       // Determine which player (color) to join as
-      var joinColor = (game.players[0].joined) ? game.players[1].color : game.players[0].color;
+      // 不依赖 players[0].joined（创建者可能还没连上 socket，存在竞态）：
+      // 直接分配与创建者相反的颜色，保证加入者永远拿到空闲槽位
+      var joinColor = (game.players[0].color === 'red') ? 'blue' : 'red';
 
       // Save data to session
       (req.session as any).gameID = validData.gameID;
