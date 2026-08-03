@@ -285,8 +285,8 @@ select.form-control { cursor: pointer; }
 }
 
 #board td {
-  width: 66px;
-  height: 34px;
+  width: 78px;
+  height: 42px;
   text-align: center;
   vertical-align: middle;
   padding: 0;
@@ -305,25 +305,76 @@ select.form-control { cursor: pointer; }
 
 #board td.square:hover { background: rgba(255,255,255,.12); }
 
-/* 大本营 & 行营 - 由 JS 添�� bunker/hq class */
-#board td.square.bunker { background: rgba(139,92,246,.08); }
-#board td.square.hq { background: rgba(139,92,246,.15); border: 1px solid rgba(139,92,246,.25); }
+/* 大本营 & 行营 - 由 JS 添加 bunker/hq class */
+#board td.square.bunker {
+  background:
+    radial-gradient(circle at 8px 8px, rgba(139,92,246,.3) 0 2px, transparent 2.5px);
+  background-size: 16px 16px;
+  background-color: rgba(139,92,246,.07);
+  border: 1px dashed rgba(139,92,246,.35);
+}
+#board td.square.hq {
+  background:
+    repeating-linear-gradient(45deg, rgba(139,92,246,.30) 0 6px, rgba(139,92,246,.10) 6px 12px);
+  border: 1px solid rgba(139,92,246,.45);
+}
+#board td.square.bunker:hover {
+  background:
+    radial-gradient(circle at 8px 8px, rgba(139,92,246,.38) 0 2px, transparent 2.5px);
+  background-size: 16px 16px;
+  background-color: rgba(139,92,246,.12);
+}
+#board td.square.hq:hover {
+  background:
+    repeating-linear-gradient(45deg, rgba(139,92,246,.40) 0 6px, rgba(139,92,246,.15) 6px 12px);
+}
 
-/* 铁路 - 由 JS 添加 rail class */
-#board td.square.rail-left { border-left: 3px solid var(--wood-line); }
-#board td.square.rail-right { border-right: 3px solid var(--wood-line); }
-#board td.square.rail-top { border-top: 3px solid var(--wood-line); }
-#board td.square.rail-bottom { border-bottom: 3px solid var(--wood-line); }
+/* 大本营/行营 侧边竖排标注 */
+#board td.square .cell-label {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-size: 8px;
+  line-height: 10px;
+  letter-spacing: 1px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: .85;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#board td.square.hq .cell-label { color: #e9d5ff; text-shadow: 0 0 3px rgba(0,0,0,.4); }
+#board td.square.bunker .cell-label { color: #a78bfa; }
+
+/* 铁路 - 由 JS 添加 rail class：4px 轨道线 + 枕木纹理 */
+#board td.square.rail-left {
+  border-left: 4px solid var(--wood-line);
+  background-image: repeating-linear-gradient(90deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
+}
+#board td.square.rail-right {
+  border-right: 4px solid var(--wood-line);
+  background-image: repeating-linear-gradient(90deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
+}
+#board td.square.rail-top {
+  border-top: 4px solid var(--wood-line);
+  background-image: repeating-linear-gradient(0deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
+}
+#board td.square.rail-bottom {
+  border-bottom: 4px solid var(--wood-line);
+  background-image: repeating-linear-gradient(0deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
+}
 
 /* ========== 棋子 ========== */
-/* 所有棋子通用圆形样式，使用伪元素渲染 */
+/* 所有棋子通用圆角矩形样式，使用伪元素渲染 */
 #board td.red::before, #board td.blue::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 44px;
-  border-radius: 50%;
+  width: 42px;
+  height: 32px;
+  border-radius: 9px;
   font-size: 13px;
   font-weight: 600;
   position: absolute;
@@ -340,10 +391,10 @@ select.form-control { cursor: pointer; }
   content: "";
   position: absolute;
   top: 50%; left: 50%;
-  width: 50px; height: 44px;
+  width: 42px; height: 32px;
   transform: translate(-50%,-50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.35), rgba(255,255,255,0) 45%);
+  border-radius: 9px;
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.35), rgba(255,255,255,0) 55%);
   z-index: 3;
   pointer-events: none;
 }
@@ -384,9 +435,9 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
 /* 暗棋 */
 #board td.facedown::before {
   content: "?" !important;
-  width: 50px !important;
-  height: 44px !important;
-  font-size: 18px !important;
+  width: 42px !important;
+  height: 32px !important;
+  font-size: 16px !important;
   background: #475569 !important;
   color: #94a3b8 !important;
   border: 2px solid #334155 !important;
@@ -394,7 +445,7 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border-radius: 50% !important;
+  border-radius: 9px !important;
   position: absolute !important;
   top: 50% !important; left: 50% !important;
   transform: translate(-50%,-50%) !important;
@@ -440,6 +491,39 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
 #board td.last-move { background: rgba(139,92,246,.14) !important; }
 #board td.last-move::before { box-shadow: 0 0 0 3px var(--accent-purple) !important; }
 
+/* ========== 棋盘图例 ========== */
+.board-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 2px;
+  max-width: 540px;
+  font-size: .74rem;
+  color: var(--text-muted);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.sw-hq {
+  background: repeating-linear-gradient(45deg, rgba(139,92,246,.55) 0 3px, rgba(139,92,246,.15) 3px 6px);
+  border: 1px solid rgba(139,92,246,.5);
+}
+.sw-bunker {
+  background: radial-gradient(circle at 4px 4px, rgba(139,92,246,.5) 0 1.5px, transparent 2px);
+  background-size: 8px 8px;
+  background-color: rgba(139,92,246,.15);
+  border: 1px dashed rgba(139,92,246,.4);
+}
+.sw-rail { background: var(--wood-line); }
+.sw-normal { background: rgba(255,255,255,.1); border: 1px solid rgba(120,80,40,.4); }
+
 /* ========== 控制按钮 ========== */
 .game-controls { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
 .game-controls .btn { flex: 1; max-width: 160px; }
@@ -463,7 +547,9 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
 @media (max-width: 768px) {
   .game-container { grid-template-columns: 1fr; max-width: 420px; }
   .side-panel { display: none; }
-  #board td { width: 56px; height: 30px; font-size: 11px; }
+  #board td { width: 64px; height: 34px; font-size: 11px; }
   #board td.red::before, #board td.blue::before,
-  #board td.facedown::before { width: 42px; height: 38px; font-size: 11px; }
+  #board td.facedown::before { width: 36px; height: 26px; font-size: 11px; border-radius: 8px; }
+  #board td.red::after, #board td.blue::after { width: 36px; height: 26px; border-radius: 8px; }
+  #board td.square .cell-label { font-size: 7px; line-height: 9px; left: 2px; }
 }

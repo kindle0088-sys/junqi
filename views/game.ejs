@@ -40,6 +40,13 @@
       <div id="game">
         <table id="board"></table>
 
+        <div class="board-legend">
+          <span class="legend-item"><span class="legend-swatch sw-hq"></span>大本营（军旗所在，不可攻击）</span>
+          <span class="legend-item"><span class="legend-swatch sw-bunker"></span>行营（营内棋子不受攻击）</span>
+          <span class="legend-item"><span class="legend-swatch sw-rail"></span>铁路（沿线可快速移动）</span>
+          <span class="legend-item"><span class="legend-swatch sw-normal"></span>普通路线</span>
+        </div>
+
         <div class="game-controls">
           <button id="finishSetup" type="submit" class="btn btn-primary btn-sm">✅ 完成布阵</button>
           <button id="forfeit" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#forfeit-game">🏳️ 认输</button>

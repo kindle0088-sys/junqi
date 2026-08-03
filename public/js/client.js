@@ -89,10 +89,12 @@ const initBoardMarkers = (squares) => {
         // Bunker
         if (bunkerIds.includes(id)) {
             $(this).addClass('bunker');
+            $(this).append('<span class="cell-label">行营</span>');
         }
         // Headquarters
         if (hqIds.includes(id)) {
             $(this).addClass('hq');
+            $(this).append('<span class="cell-label">大本营</span>');
         }
         // Railway - left/right columns
         const col = id[0];
