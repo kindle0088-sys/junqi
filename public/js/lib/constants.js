@@ -100,13 +100,13 @@ export const ELEMENT_IDS = {
     MESSAGES: 'messages',
     BOARD: 'board',
     GAME_OVER: 'game-over',
-    FORFEIT_GAME: 'forfeit-game',
+    REMATCH_GAME: 'rematch-game',
     YOU: 'you',
     OPPONENT: 'opponent',
     FINISH_SETUP: 'finishSetup',
-    FORFEIT: 'forfeit',
-    CANCEL_FORFEIT: 'cancel-forfeit',
-    CONFIRM_FORFEIT: 'confirm-forfeit'
+    REMATCH: 'rematch',
+    CANCEL_REMATCH: 'cancel-rematch',
+    CONFIRM_REMATCH: 'confirm-rematch'
 };
 
 // Selectors

@@ -358,6 +358,39 @@ export class Game {
     }
 
     /**
+     * Reset the game for a rematch.
+     * Keeps players' identity (name/color/joined/isAI) but resets board & state.
+     */
+    reset(): void {
+        this.status = GameStatus.PENDING;
+        this.activePlayer = null;
+
+        // Reset player states, keep identity
+        this.players.forEach(p => {
+            p.isSetup = false;
+            p.inCheck = false;
+            p.hasCommander = true;
+            p.hasMoveablePieces = true;
+            p.forfeited = false;
+        });
+
+        // AI player re-joins and auto-finishes setup
+        this.players.forEach(p => {
+            if (p.isAI) {
+                p.joined = true;
+                p.isSetup = true;
+            }
+        });
+
+        this.board = new Board();
+        this.capturedPieces = [];
+        this.validMoves = this.board.getMovesForPlayer('blue');
+        this.validSwap = this.board.getSwapForAll();
+        this.lastMove = null;
+        this.modifiedOn = Date.now();
+    }
+
+    /**
      * Forfeit the game
      */
     forfeit(playerData: PlayerSession): boolean {

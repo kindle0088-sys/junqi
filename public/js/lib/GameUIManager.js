@@ -14,7 +14,7 @@ class GameUIManager {
         this.board = this.getElement(ELEMENT_IDS.BOARD);
         this.squares = null;
         this.gameOverMessage = this.getElement(ELEMENT_IDS.GAME_OVER);
-        this.forfeitPrompt = this.getElement(ELEMENT_IDS.FORFEIT_GAME);
+        this.rematchPrompt = this.getElement(ELEMENT_IDS.REMATCH_GAME);
         this.playerColor = null;
         this.containers = {
             you: this.getElement(ELEMENT_IDS.YOU),
@@ -36,7 +36,7 @@ class GameUIManager {
     initModals() {
         const modalConfig = { show: false, keyboard: false, backdrop: 'static' };
         this.gameOverMessage.modal(modalConfig);
-        this.forfeitPrompt.modal(modalConfig);
+        this.rematchPrompt.modal(modalConfig);
     }
 
     setPlayerColor(color) {
@@ -60,18 +60,18 @@ class GameUIManager {
         this.messages.append(alertDiv);
     }
 
-    showForfeitPrompt(callback) {
-        this.forfeitPrompt.one('click', `#${ELEMENT_IDS.CANCEL_FORFEIT}`, () => {
+    showRematchPrompt(callback) {
+        this.rematchPrompt.one('click', `#${ELEMENT_IDS.CANCEL_REMATCH}`, () => {
             callback(false);
-            this.forfeitPrompt.modal('hide');
+            this.rematchPrompt.modal('hide');
         });
 
-        this.forfeitPrompt.one('click', `#${ELEMENT_IDS.CONFIRM_FORFEIT}`, () => {
+        this.rematchPrompt.one('click', `#${ELEMENT_IDS.CONFIRM_REMATCH}`, () => {
             callback(true);
-            this.forfeitPrompt.modal('hide');
+            this.rematchPrompt.modal('hide');
         });
 
-        this.forfeitPrompt.modal('show');
+        this.rematchPrompt.modal('show');
     }
 
     showGameOver(type) {

@@ -31,8 +31,6 @@
         <span id="game-info">载入中…</span>
       </div>
 
-      <div id="game-result" class="game-result" style="display:none;"></div>
-
       <div id="messages"></div>
 
       <div id="turn-banner" class="turn-banner">
@@ -51,7 +49,7 @@
 
         <div class="game-controls">
           <button id="finishSetup" type="submit" class="btn btn-primary btn-sm">✅ 完成布阵</button>
-          <button id="forfeit" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#forfeit-game">🏳️ 认输</button>
+          <button id="rematch" class="btn btn-secondary btn-sm">🔄 再来一局</button>
         </div>
       </div>
     </div>
@@ -84,16 +82,17 @@
     </div>
   </div>
 
-  <!-- 认输确认弹窗 -->
-  <div id="forfeit-game" class="modal fade">
+  <!-- 再来一局确认弹窗（对局未结束时，投降并重开） -->
+  <div id="rematch-game" class="modal fade">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-body">
-          <h2>确定要认输吗？</h2>
+          <h2>🏳️ 确定要认输并开始下一局吗？</h2>
+          <p style="color:var(--text-muted);font-size:.85rem;margin-top:8px;">确认后将判对方获胜，然后开启全新一局</p>
         </div>
         <div class="modal-footer">
-          <button id="cancel-forfeit" class="btn btn-secondary" data-dismiss="modal">取消</button>
-          <button id="confirm-forfeit" class="btn btn-danger">确认认输</button>
+          <button id="cancel-rematch" class="btn btn-secondary" data-dismiss="modal">取消</button>
+          <button id="confirm-rematch" class="btn btn-danger">确认投降</button>
         </div>
       </div>
     </div>

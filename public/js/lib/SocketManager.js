@@ -39,6 +39,10 @@ class SocketManager {
     forfeit(gameID) {
         this.socket.emit('forfeit', gameID);
     }
+
+    rematch(gameID) {
+        this.socket.emit('rematch', gameID);
+    }
 }
 
 export default SocketManager;

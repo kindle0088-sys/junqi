@@ -267,6 +267,43 @@ const forfeit = function (this: Socket, gameID: string) {
 };
 
 /**
+ * Rematch: reset the game for a new round
+ * Emits an "update" event on success or an "error" event on failure
+ */
+const rematch = function (this: Socket, gameID: string) {
+  const sess = getSession(this);
+  const debugInfo: DebugInfo = {
+    socketID: this.id,
+    event: 'rematch',
+    gameID: gameID,
+    session: sess
+  };
+
+  // Check if user has permission to access this game
+  if (gameID !== sess.gameID) {
+    console.log('ERROR: Access Denied', debugInfo);
+    this.emit('error', { message: "你尚未加入这个房间" });
+    return;
+  }
+
+  // Lookup game in database
+  const game = DB?.find(gameID);
+  if (!game) {
+    console.log('ERROR: Game Not Found', debugInfo);
+    this.emit('error', { message: "房间不存在" });
+    return;
+  }
+
+  // Reset the game for a new round
+  game.reset();
+
+  // Send filtered updates to all players in the game
+  sendFilteredUpdatesToGame(gameID, game);
+
+  console.log(gameID + ' ' + sess.playerName + ': Rematch');
+};
+
+/**
  * Remove player from game
  */
 const disconnect = function (this: Socket) {
@@ -309,6 +346,7 @@ export function attach(io: Server, db: GameStore): void {
     socket.on('finishSetup', finishSetup);
     socket.on('move', move);
     socket.on('forfeit', forfeit);
+    socket.on('rematch', rematch);
     socket.on('disconnect', disconnect);
 
     console.log('Socket ' + socket.id + ' connected');
