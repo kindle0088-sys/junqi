@@ -36,7 +36,7 @@ app.use(methodOverride());
 app.use(session({
   resave: true,
   saveUninitialized: true,
-  secret: 'mySecret',
+  secret: process.env.SESSION_SECRET || 'mySecret',
   store: sessionStore
 }));
 app.use(bodyParser.json());

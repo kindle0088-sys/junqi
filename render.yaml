@@ -1,0 +1,18 @@
+# Render 部署配置 — 行军旗在线对战
+# 部署方式：push 到 GitHub 后，在 render.com 选择 "Blueprint" 一键部署
+# 免费层说明：Web Service 免费实例 15 分钟无请求会休眠，唤醒需要几秒
+
+services:
+  - type: web
+    name: junqi
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: node ./dist/server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # express-session 的密钥，生产环境应改成随机值
+      - key: SESSION_SECRET
+        generateValue: true
