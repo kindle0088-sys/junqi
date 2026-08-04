@@ -7,7 +7,7 @@ services:
     name: junqi
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: node ./dist/server.js
     healthCheckPath: /
     envVars:
