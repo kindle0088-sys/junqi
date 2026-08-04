@@ -256,4 +256,57 @@ describe('Game', function () {
     });
   });
 
+  describe('#capturedPieces() 被动吃到/同归于尽记录', function () {
+    // 基于默认 60 格开局棋盘，仅覆盖攻击/防守两个格子，保证棋盘完整（缺 key 会崩 getValidMoves）
+    function makeGame(attackerSquare: string, attacker: any, defenderSquare: string, defender: any, attackerColor: 'red' | 'blue') {
+      const game = new Game({ playerName: '', playerColor: attackerColor });
+      game.board.boardState[attackerSquare] = attacker;
+      game.board.boardState[defenderSquare] = defender;
+      game.players[0].isSetup = true;
+      game.players[1].isSetup = true;
+      game.status = 'ongoing';
+      game.activePlayer = game.players[0];
+      game.validMoves = [{ type: 'attack', startSquare: attackerSquare, endSquare: defenderSquare }];
+      return game;
+    }
+
+    it('防守方被动吃掉攻击者（dies）应记入已吃清单', function () {
+      const { Piece, PieceRank } = require('../src/lib/Piece') as any;
+      // 红方 LIEUTENANT(8) b11 攻击 蓝方 CAPTAIN(7) b12 → 红死，蓝"被动吃到"红方棋子
+      const game = makeGame('b11', new Piece('r', PieceRank.LIEUTENANT), 'b12', new Piece('b', PieceRank.CAPTAIN), 'red');
+
+      const ok = game.move('b11 x b12');
+      assert.equal(ok, true);
+
+      // 攻击方（红）视角：攻击失败没吃到任何东西，清单应为空
+      const redView = game.getState('red').capturedPieces;
+      assert.equal(redView.length, 0, '红方攻击失败，不应看到已吃棋子');
+
+      // 防守方（蓝）视角：被动吃到的红方 LIEUTENANT 必须显示（本 bug 修复点）
+      const blueView = game.getState('blue').capturedPieces;
+      assert.equal(blueView.length, 1, '蓝方应看到被动吃掉的红军棋子');
+      assert.equal(blueView[0].colorChar, 'r');
+      assert.equal(blueView[0].rank, PieceRank.LIEUTENANT);
+    });
+
+    it('同归于尽（equal）双方互吃应各显示对方棋子', function () {
+      const { Piece, PieceRank } = require('../src/lib/Piece') as any;
+      // 红方 CAPTAIN(7) b11 攻击 蓝方 CAPTAIN(7) b12 → 同归于尽
+      const game = makeGame('b11', new Piece('r', PieceRank.CAPTAIN), 'b12', new Piece('b', PieceRank.CAPTAIN), 'red');
+
+      const ok = game.move('b11 x b12');
+      assert.equal(ok, true);
+
+      const redView = game.getState('red').capturedPieces;
+      assert.equal(redView.length, 1, '红方应看到同归于尽吃掉的蓝军棋子');
+      assert.equal(redView[0].colorChar, 'b');
+      assert.equal(redView[0].rank, PieceRank.CAPTAIN);
+
+      const blueView = game.getState('blue').capturedPieces;
+      assert.equal(blueView.length, 1, '蓝方应看到同归于尽吃掉的红军棋子');
+      assert.equal(blueView[0].colorChar, 'r');
+      assert.equal(blueView[0].rank, PieceRank.CAPTAIN);
+    });
+  });
+
 });

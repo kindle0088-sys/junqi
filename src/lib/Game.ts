@@ -275,11 +275,15 @@ export class Game {
                 break;
 
             case 'dies':
+                // 攻击者被防守方吃掉：必须记入已吃清单（防守方"被动吃到"对方棋子）
+                this.capturedPieces.push(this.board.getPieceAtSquare(evaluatedMove.startSquare)!);
                 this.board.setSquareEmpty(evaluatedMove.startSquare);
                 break;
 
             case 'equal':
+                // 同归于尽：双方互吃，各自清单都能看到对方被吃掉的棋子
                 this.capturedPieces.push(this.board.getPieceAtSquare(evaluatedMove.endSquare)!);
+                this.capturedPieces.push(this.board.getPieceAtSquare(evaluatedMove.startSquare)!);
                 this.board.setSquareEmpty(evaluatedMove.startSquare);
                 this.board.setSquareEmpty(evaluatedMove.endSquare);
                 break;
