@@ -2,3 +2,7 @@ coverage/
 dist/
 node_modules/
 Procfile
+
+# 本地验证产物（截图、headless Chrome profile）
+.shots/
+.chrome-profile-*/

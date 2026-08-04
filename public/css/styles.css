@@ -19,6 +19,16 @@
   --accent-green: #22c55e;
   --accent-purple: #8b5cf6;
   --border-color: #334155;
+
+  /* 棋盘尺寸参数（媒体查询覆盖以适配视口） */
+  --cell-w: 78px;
+  --cell-h: 42px;
+  --piece-w: 42px;
+  --piece-h: 32px;
+  --piece-radius: 9px;
+  --piece-fs: 13px;
+  --label-fs: 8px;
+  --rail-w: 4px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -319,14 +329,16 @@ select.form-control { cursor: pointer; }
 }
 
 #board td {
-  width: 78px;
-  height: 42px;
+  width: var(--cell-w);
+  height: var(--cell-h);
   text-align: center;
   vertical-align: middle;
   padding: 0;
   position: relative;
   user-select: none;
   -webkit-user-select: none;
+  /* 触屏：禁用双击缩放延迟，保留平移/缩放 */
+  touch-action: manipulation;
 }
 
 /* 有效游戏格子 */
@@ -370,7 +382,7 @@ select.form-control { cursor: pointer; }
   top: 50%;
   transform: translateY(-50%);
   writing-mode: vertical-rl;
-  font-size: 8px;
+  font-size: var(--label-fs);
   line-height: 10px;
   letter-spacing: 1px;
   z-index: 1;
@@ -382,21 +394,21 @@ select.form-control { cursor: pointer; }
 #board td.square.hq .cell-label { color: #e9d5ff; text-shadow: 0 0 3px rgba(0,0,0,.4); }
 #board td.square.bunker .cell-label { color: #a78bfa; }
 
-/* 铁路 - 由 JS 添加 rail class：4px 轨道线 + 枕木纹理 */
+/* 铁路 - 由 JS 添加 rail class：轨道线 + 枕木纹理 */
 #board td.square.rail-left {
-  border-left: 4px solid var(--wood-line);
+  border-left: var(--rail-w) solid var(--wood-line);
   background-image: repeating-linear-gradient(90deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
 }
 #board td.square.rail-right {
-  border-right: 4px solid var(--wood-line);
+  border-right: var(--rail-w) solid var(--wood-line);
   background-image: repeating-linear-gradient(90deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
 }
 #board td.square.rail-top {
-  border-top: 4px solid var(--wood-line);
+  border-top: var(--rail-w) solid var(--wood-line);
   background-image: repeating-linear-gradient(0deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
 }
 #board td.square.rail-bottom {
-  border-bottom: 4px solid var(--wood-line);
+  border-bottom: var(--rail-w) solid var(--wood-line);
   background-image: repeating-linear-gradient(0deg, rgba(120,80,40,.30) 0 5px, transparent 5px 12px);
 }
 
@@ -406,10 +418,10 @@ select.form-control { cursor: pointer; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 32px;
-  border-radius: 9px;
-  font-size: 13px;
+  width: var(--piece-w);
+  height: var(--piece-h);
+  border-radius: var(--piece-radius);
+  font-size: var(--piece-fs);
   font-weight: 600;
   position: absolute;
   top: 50%; left: 50%;
@@ -425,9 +437,9 @@ select.form-control { cursor: pointer; }
   content: "";
   position: absolute;
   top: 50%; left: 50%;
-  width: 42px; height: 32px;
+  width: var(--piece-w); height: var(--piece-h);
   transform: translate(-50%,-50%);
-  border-radius: 9px;
+  border-radius: var(--piece-radius);
   background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.35), rgba(255,255,255,0) 55%);
   z-index: 3;
   pointer-events: none;
@@ -469,9 +481,9 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
 /* 暗棋 */
 #board td.facedown::before {
   content: "?" !important;
-  width: 42px !important;
-  height: 32px !important;
-  font-size: 16px !important;
+  width: var(--piece-w) !important;
+  height: var(--piece-h) !important;
+  font-size: calc(var(--piece-fs) + 3px) !important;
   background: #475569 !important;
   color: #94a3b8 !important;
   border: 2px solid #334155 !important;
@@ -479,7 +491,7 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border-radius: 9px !important;
+  border-radius: var(--piece-radius) !important;
   position: absolute !important;
   top: 50% !important; left: 50% !important;
   transform: translate(-50%,-50%) !important;
@@ -578,12 +590,151 @@ td.red.rank11::before { content: "🚩旗"; font-size: 11px; } td.blue.rank11::b
 .modal-footer { border: none; text-align: center; padding: 0 24px 20px; justify-content: center; }
 
 /* ========== 响应式 ========== */
+
+/* 触屏设备：禁用 hover 效果（避免 sticky hover 残留） */
+@media (hover: none) {
+  #board td.square:hover { background: rgba(255,255,255,.05); }
+  #board td.square.bunker:hover {
+    background-color: rgba(139,92,246,.07);
+  }
+  #board td.square.hq:hover {
+    background: repeating-linear-gradient(45deg, rgba(139,92,246,.30) 0 6px, rgba(139,92,246,.10) 6px 12px);
+  }
+  #board td.red:hover::before, #board td.blue:hover::before {
+    transform: translate(-50%,-50%);
+    filter: none;
+  }
+  .btn:hover { background: inherit; }
+  .btn-primary:hover { background: var(--accent-blue); }
+  .btn-danger:hover { background: var(--accent-red); }
+  .btn-secondary:hover { background: #334155; }
+  .btn-ai:hover { background: linear-gradient(135deg, #7c3aed, #4f46e5); }
+}
+
+/* 首页窄屏优化 */
 @media (max-width: 768px) {
-  .game-container { grid-template-columns: 1fr; max-width: 420px; }
-  .side-panel { display: none; }
-  #board td { width: 64px; height: 34px; font-size: 11px; }
-  #board td.red::before, #board td.blue::before,
-  #board td.facedown::before { width: 36px; height: 26px; font-size: 11px; border-radius: 8px; }
-  #board td.red::after, #board td.blue::after { width: 36px; height: 26px; border-radius: 8px; }
-  #board td.square .cell-label { font-size: 7px; line-height: 9px; left: 2px; }
+  .junqi-header { padding: 24px 16px 20px; }
+  .junqi-header h1 { font-size: 1.6rem; }
+  .junqi-header p { font-size: .85rem; padding: 0 8px; }
+  .home-container { margin: 20px auto; padding: 0 12px; max-width: 100%; }
+  .home-card { padding: 16px; border-radius: 10px; }
+  .home-card h3 { font-size: 1rem; margin-bottom: 12px; }
+  .btn-group .btn { padding: 8px 12px; font-size: .82rem; }
+  .btn { min-height: 44px; }
+  .home-card .btn[type="submit"] { font-size: .9rem; }
+}
+
+/* 平板及以下：单列布局，侧栏变成棋盘上方/下方紧凑横条 */
+@media (max-width: 768px) {
+  /* 全局：缩小页面 padding，启用安全区 */
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* 棋盘自适应：格子宽度 = min(68px, (视口宽 - 32px)/5)，高度按 78:42 比例 */
+  :root {
+    --cell-w: min(68px, calc((100vw - 24px) / 5));
+    --cell-h: calc(var(--cell-w) * 42 / 78);
+    --piece-w: calc(var(--cell-w) * 42 / 78);
+    --piece-h: calc(var(--cell-h) * 32 / 42);
+    --piece-radius: 7px;
+    --piece-fs: 11px;
+    --label-fs: 6.5px;
+    --rail-w: 3px;
+  }
+
+  .navbar { padding: 8px 12px; }
+  .navbar-brand { font-size: .98rem; }
+  .navbar .room-info { font-size: .76rem !important; }
+
+  /* 改单列布局：对手紧凑横条 → 棋盘 → 我方+战果紧凑横条 */
+  .game-container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "opponent"
+      "board"
+      "you";
+    gap: 8px;
+    max-width: 100%;
+    padding: 0 8px;
+    margin: 10px auto;
+  }
+  #opponent-panel { grid-area: opponent; }
+  .board-area { grid-area: board; }
+  #you-panel { grid-area: you; }
+
+  /* 侧栏改紧凑横条 */
+  .side-panel {
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+  .side-panel .player-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .side-panel .player-info .player-name { font-size: .9rem; margin-bottom: 0; }
+  .side-panel .player-info .player-status { font-size: .75rem; }
+
+  /* 战果面板：横排放紧凑，不占垂直 */
+  .captures-panel {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  .captures-panel h4 { font-size: .72rem; margin-bottom: 6px; }
+  .capture-chip {
+    width: 24px;
+    height: 24px;
+    font-size: 9px;
+    border-width: 1px;
+  }
+
+  /* 顶栏信息：允许换行紧凑 */
+  #game-info { font-size: .8rem; line-height: 1.4; }
+  #game-info .info-sep { margin: 0 5px; }
+
+  /* 回合条：缩 padding */
+  .turn-banner { margin: 6px auto 8px; padding: 8px 10px; font-size: .82rem; }
+  .turn-banner.turn-win #turn-text, .turn-banner.turn-lose #turn-text { font-size: 1.1rem; }
+
+  /* 棋盘：圆角缩小防溢出 */
+  #board { border-radius: 10px; }
+  .board-legend {
+    font-size: .68rem;
+    gap: 4px 10px;
+    margin: 6px auto 0;
+  }
+  .legend-swatch { width: 12px; height: 12px; }
+
+  /* 控制按钮：min-height 44px 触屏标准 */
+  .game-controls { gap: 6px; margin-top: 8px; }
+  .game-controls .btn {
+    min-height: 44px;
+    font-size: .85rem;
+    max-width: none;
+  }
+  .btn { min-height: 44px; }
+  .btn-sm { padding: 10px 16px; font-size: .85rem; }
+}
+
+/* 手机窄屏：进一步压缩棋盘 */
+@media (max-width: 360px) {
+  :root {
+    --cell-w: min(60px, calc((100vw - 16px) / 5));
+    --piece-fs: 10px;
+    --label-fs: 6px;
+  }
+  .navbar-brand { font-size: .9rem; }
+  .game-controls .btn { font-size: .8rem; padding: 8px 10px; }
+}
+
+/* 横屏手机（棋盘太矮可加滚动） */
+@media (max-height: 500px) and (orientation: landscape) {
+  .game-container {
+    grid-template-areas:
+      "opponent you"
+      "board   board";
+    grid-template-columns: 1fr 1fr;
+  }
+  .board-area { overflow-x: auto; }
 }
