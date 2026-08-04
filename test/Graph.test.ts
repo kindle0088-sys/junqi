@@ -5,11 +5,16 @@ import { Graph } from '../src/lib/Graph';
 describe('Graph', function () {
   var graph = new Graph();
 
-  describe('#headquartersImmobile()', function () {
-    it('headquarter nodes should have no neighbors', function () {
+  describe('#headquarterNeighbors()', function () {
+    it('headquarter nodes should keep normal cross adjacency (pieces can move out)', function () {
+      // 2026-08-04 修复：大本营邻接不再清空，非地雷棋子可从大本营走出。
+      // b1/d1/b12/d12 都在棋盘边缘，十字邻接各有 3 个邻居。
+      const expected: { [key: string]: number } = {
+        'b1': 3, 'd1': 3, 'b12': 3, 'd12': 3
+      };
       HEADQUARTER_SQUARES.forEach(function(square) {
         var neighbors = graph.getAdjacentNeighbors(square);
-        assert.equal(neighbors.size, 0);
+        assert.equal(neighbors.size, expected[square], `${square} should have ${expected[square]} neighbors`);
       });
     });
   });
